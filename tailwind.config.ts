@@ -1,20 +1,117 @@
-import type { Config } from "tailwindcss";
+import type {Config} from "tailwindcss";
 
 const config: Config = {
-  content: [
-    "./pages/**/*.{js,ts,jsx,tsx,mdx}",
-    "./components/**/*.{js,ts,jsx,tsx,mdx}",
-    "./app/**/*.{js,ts,jsx,tsx,mdx}",
-  ],
-  theme: {
-    extend: {
-      backgroundImage: {
-        "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
-        "gradient-conic":
-          "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
-      },
+    content: [
+        "./pages/**/*.{js,ts,jsx,tsx,mdx}",
+        "./components/**/*.{js,ts,jsx,tsx,mdx}",
+        "./app/**/*.{js,ts,jsx,tsx,mdx}",
+    ],
+    theme: {
+        extend: {
+            colors: {
+                pastelPink: {
+                    50: '#FFE4E8',
+                    100: '#FFC2CB',
+                    200: '#FF9FAB',
+                    300: '#FF7B8A',
+                    400: '#FF576A',
+                    500: '#FF334A',
+                    600: '#FF0F2A',
+                    700: '#E60025',
+                    800: '#B3001C',
+                    900: '#800014',
+                },
+                pastelYellow: {
+                    50: '#FFFDF1',
+                    100: '#FFF8D8',
+                    200: '#FFF2BF',
+                    300: '#FFEDAA',
+                    400: '#FFE797',
+                    500: '#FFE083',
+                    600: '#FFD96F',
+                    700: '#D6B757',
+                    800: '#A78D3E',
+                    900: '#796526',
+                },
+                pastelGreen: {
+                    50: '#EFF8E6',
+                    100: '#D8F0BF',
+                    200: '#BEE99A',
+                    300: '#A2E075',
+                    400: '#89D956',
+                    500: '#6FD03A',
+                    600: '#5DBB2F',
+                    700: '#4B9724',
+                    800: '#37751B',
+                    900: '#2A5813',
+                },
+                pastelBlue: {
+                    50: '#E5F7FF',
+                    100: '#CDEFFF',
+                    200: '#A3E1FF',
+                    300: '#7AD3FF',
+                    400: '#53C6FF',
+                    500: '#2BB9FF',
+                    600: '#00AFFF',
+                    700: '#0095E0',
+                    800: '#0076B3',
+                    900: '#005A85',
+                },
+                pastelPurple: {
+                    50: '#F6EDFC',
+                    100: '#EEDBF9',
+                    200: '#E3C4F6',
+                    300: '#D7ADF3',
+                    400: '#CD99F0',
+                    500: '#C385ED',
+                    600: '#B26FEA',
+                    700: '#945AD3',
+                    800: '#7544A7',
+                    900: '#56327D',
+                },
+                pastelPeach: {
+                    50: '#FFF4EB',
+                    100: '#FFE6D1',
+                    200: '#FFCCAD',
+                    300: '#FFB38C',
+                    400: '#FF9970',
+                    500: '#FF7F57',
+                    600: '#FF643F',
+                    700: '#E6502F',
+                    800: '#B33D23',
+                    900: '#802B18',
+                },
+                pastelMint: {
+                    50: '#ECFBF4',
+                    100: '#D0F5E5',
+                    200: '#A9EED1',
+                    300: '#7CE7BC',
+                    400: '#50DFAB',
+                    500: '#24D89A',
+                    600: '#1CB882',
+                    700: '#17966A',
+                    800: '#107451',
+                    900: '#0A553B',
+                },
+                pastelLavender: {
+                    50: '#F7F2FE',
+                    100: '#E9DFFF',
+                    200: '#D3C1FE',
+                    300: '#BEA3FE',
+                    400: '#AA86FE',
+                    500: '#9569FE',
+                    600: '#7E53D6',
+                    700: '#663FAB',
+                    800: '#4D2B80',
+                    900: '#371F5B',
+                },
+            },
+            boxShadow: {
+                innerMd: "inset 2px 1px 4px 2px rgba(0, 0, 0, 0.1)",
+                innerXl: "inset 2px 1px 10px 4px #D3C1FE",
+            }
+        },
     },
-  },
-  plugins: [],
+    plugins: [],
 };
 export default config;

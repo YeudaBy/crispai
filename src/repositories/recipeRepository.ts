@@ -1,187 +1,273 @@
-import { Comment } from "../model/Comment";
-import {Recipe} from "@/src/model/Recipe";
-import { User } from "../model/User";
-import {Ingredient} from "@/src/model/Ingredient";
-import {Step} from "@/src/model/Step";
+import {Recipe, RecipePreview} from "@/src/model/Recipe";
+import {User} from "../model/User";
+import {db} from "../other/db";
+import {userRepository} from "@/src/repositories/userRepository";
 
 export interface IRecipeRepository {
-    getRecipe(id: string): Promise<Recipe>;
-    getRecipesByLikes(): Promise<Recipe[]>;
-    getRecipesByDate(): Promise<Recipe[]>;
-    getRecipesByUser(userId: string): Promise<Recipe[]>;
-    getRecipesByCategory(category: string): Promise<Recipe[]>;
-    getRecipesBySearch(search: string): Promise<Recipe[]>;
+    getRecipe(id: number): Promise<Recipe | undefined>;
 
-    createRecipe(recipe: Recipe): Promise<Recipe>;
-    updateRecipe(recipe: Recipe): Promise<Recipe>;
-    deleteRecipe(id: string): Promise<void>;
+    getRecipePreview(id: number): Promise<RecipePreview | undefined>;
 
-    likeRecipe(id: string, userId: string): Promise<boolean>;
-    unlikeRecipe(id: string, userId: string): Promise<boolean>;
-    getLikedRecipes(userId: string): Promise<Recipe[]>;
-    getUsersWhoLiked(id: string): Promise<User[]>;
+    getRecipesByLikes(): Promise<RecipePreview[]>;
 
-    addComment(id: string, comment: Comment): Promise<Recipe>;
-    deleteComment(id: string, commentId: string): Promise<Recipe>;
+    getRecipesByDate(): Promise<RecipePreview[]>;
 
-    addIngredient(id: string, ingredientId: string): Promise<Recipe>;
-    deleteIngredient(id: string, ingredientId: string): Promise<Recipe>;
+    getRecipesByUser(userId: number): Promise<RecipePreview[]>;
 
-    addStep(id: string, step: Step): Promise<Recipe>;
-    deleteStep(id: string, stepId: string): Promise<Recipe>;
-    changeStepOrder(id: string, stepId: string, order: number): Promise<Recipe>;
+    getRecipesByCategory(category: number): Promise<RecipePreview[]>;
 
-    addImage(id: string, image: string): Promise<Recipe>;
-    deleteImage(id: string, image: string): Promise<Recipe>;
+    getRecipesBySearch(search: string): Promise<RecipePreview[]>;
 
-    addCategory(id: string, categoryId: string): Promise<Recipe>;
-    deleteCategory(id: string, categoryId: string): Promise<Recipe>;
+    createRecipe(
+        title: string,
+        description: string,
+        userId: number,
+    ): Promise<number>;
 
-    addTag(id: string, tagId: string): Promise<Recipe>;
-    deleteTag(id: string, tagId: string): Promise<Recipe>;
+    updateTitle(id: number, title: string): Promise<void>;
 
-    addEquipment(id: string, equipmentId: string): Promise<Recipe>;
-    deleteEquipment(id: string, equipmentId: string): Promise<Recipe>;
+    updateDescription(id: number, description: string): Promise<void>;
+
+    deleteRecipe(id: number): void;
+
+    likeRecipe(id: number, userId: number): void;
+
+    unlikeRecipe(id: number, userId: number): void;
+
+    getLikedRecipes(userId: number): Promise<RecipePreview[]>;
+
+    getUsersWhoLiked(id: number): Promise<User[]>;
 }
 
 class RecipeRepository implements IRecipeRepository {
-    async getRecipe(id: string): Promise<Recipe> {
-        // Get recipe from database
-        return new Recipe();
+    async getRecipe(id: number): Promise<Recipe | undefined> {
+        const recipe = await db
+            .selectFrom('recipe')
+            .leftJoin('recipeLike', 'recipe.id', 'recipeLike.recipeId')
+            .select(({fn, val}) => [
+                'id', 'title', 'description', 'recipe.author', 'date',
+                fn.count<number>(val('recipeLike.userId')).as('likes'),
+            ])
+            .where('recipe.id', '=', id)
+            .executeTakeFirst();
+
+        if (!recipe) {
+            return undefined
+        }
+
+        const user = await userRepository.getUser(recipe.author)
+        if (!user) {
+            throw new Error('User not found')
+        }
+
+        return {
+            id: recipe.id,
+            title: recipe.title,
+            description: recipe.description,
+            likes: recipe.likes,
+            date: recipe.date,
+            user: user,
+            comments: [],
+            ingredients: [],
+            steps: [],
+            images: [],
+            categories: [],
+            tags: [],
+            equipment: [],
+        }
     }
 
-    async getRecipesByLikes(): Promise<Recipe[]> {
-        // Get recipes from database
-        return [new Recipe()];
+    async getRecipePreview(id: number): Promise<RecipePreview | undefined> {
+        const recipe = await db
+            .selectFrom('recipe')
+            .leftJoin('recipeLike', 'recipe.id', 'recipeLike.recipeId')
+            .select(({fn, val}) => [
+                'id', 'title', 'description', 'recipe.author', 'date',
+                fn.count<number>(val('recipeLike.userId')).as('likes'),
+            ])
+            .where('recipe.id', '=', id)
+            .executeTakeFirst();
+
+        if (!recipe) {
+            return undefined
+        }
+
+        const user = await userRepository.getUserPreview(recipe.author)
+        if (!user) {
+            throw new Error('User not found')
+        }
+
+        return {
+            id: recipe.id,
+            title: recipe.title,
+            description: recipe.description,
+            likes: recipe.likes,
+            date: recipe.date,
+            user: user,
+            categories: [],
+            tags: [],
+        }
     }
 
-    async getRecipesByDate(): Promise<Recipe[]> {
-        // Get recipes from database
-        return [new Recipe()];
+    async getRecipesByLikes(): Promise<RecipePreview[]> {
+        const ids = await db
+            .selectFrom('recipe')
+            .leftJoin('recipeLike', 'recipe.id', 'recipeLike.recipeId')
+            .select(({fn, val}) => [
+                'id',
+                fn.count<number>(val('recipeLike.userId')).as('likes'),
+            ])
+            .groupBy('recipe.id')
+            .orderBy('likes', 'desc')
+            .execute();
+
+        const recipes = await Promise.all(ids.map(async (recipe) => {
+            return this.getRecipePreview(recipe.id);
+        }));
+
+        return recipes.filter((recipe): recipe is Recipe => recipe !== undefined);
     }
 
-    async getRecipesByUser(userId: string): Promise<Recipe[]> {
-        // Get recipes from database
-        return [new Recipe()];
+
+    async getRecipesByDate(): Promise<RecipePreview[]> {
+        const ids = await db
+            .selectFrom('recipe')
+            .select(['id', 'date'])
+            .orderBy('date', 'desc')
+            .execute();
+
+        const recipes = await Promise.all(ids.map(async (recipe) => {
+            return this.getRecipePreview(recipe.id);
+        }));
+
+        return recipes.filter((recipe): recipe is Recipe => recipe !== undefined)
+
     }
 
-    async getRecipesByCategory(category: string): Promise<Recipe[]> {
-        // Get recipes from database
-        return [new Recipe()];
+    async getRecipesByUser(userId: number): Promise<Recipe[]> {
+        const ids = await db
+            .selectFrom('recipe')
+            .select(['id'])
+            .where('author', '=', userId)
+            .execute();
+
+        const recipes = await Promise.all(ids.map(async (recipe) => {
+            return this.getRecipe(recipe.id);
+        }));
+
+        return recipes.filter((recipe): recipe is Recipe => recipe !== undefined)
+    }
+
+    async getRecipesByCategory(category: number): Promise<Recipe[]> {
+        // todo implement
+        return []
     }
 
     async getRecipesBySearch(search: string): Promise<Recipe[]> {
-        // Get recipes from database
-        return [new Recipe()];
+        const ids = await db
+            .selectFrom('recipe')
+            .select(['id'])
+            .where('title', 'like', `%${search}%`)
+            .execute();
+
+        const recipes = await Promise.all(ids.map(async (recipe) => {
+            return this.getRecipe(recipe.id);
+        }));
+
+        return recipes.filter((recipe): recipe is Recipe => recipe !== undefined)
     }
 
-    async createRecipe(recipe: Recipe): Promise<Recipe> {
-        // Create recipe in database
-        return new Recipe();
+    async createRecipe(
+        title: string,
+        description: string,
+        userId: number
+    ): Promise<number> {
+        const newRecipe = await db
+            .insertInto('recipe')
+            .values({
+                title,
+                description,
+                author: userId,
+                date: new Date(),
+            })
+            .returning('id')
+            .executeTakeFirst();
+
+        if (!newRecipe) {
+            throw new Error('Recipe not created')
+        }
+
+        return newRecipe.id;
     }
 
-    async updateRecipe(recipe: Recipe): Promise<Recipe> {
-        // Update recipe in database
-        return new Recipe();
+    async updateTitle(id: number, title: string): Promise<void> {
+        await db
+            .updateTable('recipe')
+            .set('title', title)
+            .where('id', '=', id)
+            .execute();
     }
 
-    async deleteRecipe(id: string): Promise<void> {
-        // Delete recipe from database
+    async updateDescription(id: number, description: string): Promise<void> {
+        await db
+            .updateTable('recipe')
+            .set('description', description)
+            .where('id', '=', id)
+            .execute();
     }
 
-    async likeRecipe(id: string, userId: string): Promise<boolean> {
-        // Like recipe in database
-        return true;
+    deleteRecipe(id: number) {
+        db
+            .deleteFrom('recipe')
+            .where('id', '=', id)
+            .execute();
     }
 
-    async unlikeRecipe(id: string, userId: string): Promise<boolean> {
-        // Unlike recipe in database
-        return true;
+    likeRecipe(id: number, userId: number) {
+        db
+            .insertInto('recipeLike')
+            .values({
+                recipeId: id,
+                userId: userId,
+            })
+            .execute();
     }
 
-    async getLikedRecipes(userId: string): Promise<Recipe[]> {
-        // Get recipes from database
-        return [new Recipe()];
+    unlikeRecipe(id: number, userId: number) {
+        db
+            .deleteFrom('recipeLike')
+            .where('recipeId', '=', id)
+            .where('userId', '=', userId)
+            .execute();
     }
 
-    async getUsersWhoLiked(id: string): Promise<User[]> {
-        // Get users from database
-        return [new User()];
+    async getLikedRecipes(userId: number): Promise<Recipe[]> {
+        const ids = await db
+            .selectFrom('recipeLike')
+            .select(['recipeId'])
+            .where('userId', '=', userId)
+            .execute();
+
+        const recipes = await Promise.all(ids.map(async (recipe) => {
+            return this.getRecipe(recipe.recipeId);
+        }));
+
+        return recipes.filter((recipe): recipe is Recipe => recipe !== undefined)
     }
 
-    async addComment(id: string, comment: Comment): Promise<Recipe> {
-        // Add comment to recipe in database
-        return new Recipe();
-    }
+    async getUsersWhoLiked(id: number): Promise<User[]> {
+        const ids = await db
+            .selectFrom('recipeLike')
+            .select(['userId'])
+            .where('recipeId', '=', id)
+            .execute();
 
-    async deleteComment(id: string, commentId: string): Promise<Recipe> {
-        // Delete comment from recipe in database
-        return new Recipe();
-    }
+        const users = await Promise.all(ids.map(async (user) => {
+            return userRepository.getUser(user.userId);
+        }));
 
-    async addIngredient(id: string, ingredientId: string): Promise<Recipe> {
-        // Add ingredient to recipe in database
-        return new Recipe();
+        return users.filter((user): user is User => user !== undefined)
     }
-
-    async deleteIngredient(id: string, ingredientId: string): Promise<Recipe> {
-        // Delete ingredient from recipe in database
-        return new Recipe();
-    }
-
-    async addStep(id: string, step: Step): Promise<Recipe> {
-        // Add step to recipe in database
-        return new Recipe();
-    }
-
-    async deleteStep(id: string, stepId: string): Promise<Recipe> {
-        // Delete step from recipe in database
-        return new Recipe();
-    }
-
-    async changeStepOrder(id: string, stepId: string, order: number): Promise<Recipe> {
-        // Change step order in recipe in database
-        return new Recipe();
-    }
-
-    async addImage(id: string, image: string): Promise<Recipe> {
-        // Add image to recipe in database
-        return new Recipe();
-    }
-
-    async deleteImage(id: string, image: string): Promise<Recipe> {
-        // Delete image from recipe in database
-        return new Recipe();
-    }
-
-    async addCategory(id: string, categoryId: string): Promise<Recipe> {
-        // Add category to recipe in database
-        return new Recipe();
-    }
-
-    async deleteCategory(id: string, categoryId: string): Promise<Recipe> {
-        // Delete category from recipe in database
-        return new Recipe();
-    }
-
-    async addTag(id: string, tagId: string): Promise<Recipe> {
-        // Add tag to recipe in database
-        return new Recipe();
-    }
-
-    async deleteTag(id: string, tagId: string): Promise<Recipe> {
-        // Delete tag from recipe in database
-        return new Recipe();
-    }
-
-    async addEquipment(id: string, equipmentId: string): Promise<Recipe> {
-        // Add equipment to recipe in database
-        return new Recipe();
-    }
-
-    async deleteEquipment(id: string, equipmentId: string): Promise<Recipe> {
-        // Delete equipment from recipe in database
-        return new Recipe();
-    }
-
 }
+
+export const recipeRepository: IRecipeRepository = new RecipeRepository();
