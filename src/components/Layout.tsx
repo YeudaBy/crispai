@@ -27,6 +27,7 @@ export function BottomNavBar() {
             <Link href={"/author/me"}>
                 <div
                     role={"button"}
+                    onClick={() => vibrate()}
                     className={`text-wood-400 shadow-test flex rounded-full border-wood-100 font-bold
                      px-6 border-2 items-center justify-center text-sm gap-2 p-2 m-2 bg-white`}>
                     Me
@@ -37,6 +38,7 @@ export function BottomNavBar() {
             <Link href={"/explore"}>
                 <div
                     role={"button"}
+                    onClick={() => vibrate()}
                     className={`text-wood-400 shadow-test flex rounded-full border-wood-100 font-bold
                      px-6 border-2 items-center justify-center text-sm gap-2 p-2 m-2 bg-white`}>
                     Explore
@@ -47,6 +49,7 @@ export function BottomNavBar() {
             <Link href={"/"}>
                 <div
                     role={"button"}
+                    onClick={() => vibrate()}
                     className={`text-wood-400 shadow-test flex rounded-full border-wood-100 font-bold
                     px-6 border-2 items-center justify-center text-sm gap-2 p-2 m-2 bg-white`}>
                     Home
