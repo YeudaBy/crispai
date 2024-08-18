@@ -1,99 +1,119 @@
 import {db} from "../other/db";
-import {Comment} from "../model/Comment";
+import {RecipeComment} from "../model/RecipeComment";
 
 export interface ICommentRepository {
     getCommentsByRecipe(
-        recipeId: string,
+        recipeId: number,
         from?: number,
         limit?: number,
         orderBy?: 'date' | 'likes',
-    ): Promise<Comment[]>;
+    ): Promise<RecipeComment[]>;
 
     createComment(
-        recipeId: string,
-        userId: string,
+        recipeId: number,
+        userId: number,
         content: string,
     ): void;
 
-    deleteComment(id: string): void;
+    deleteComment(id: number): void;
 
-    pinComment(id: string): void;
+    pinComment(id: number): void;
 
-    likeAsAuthor(id: string, content: string): void;
+    likeAsAuthor(id: number, content: string): void;
+
+    increaseLikes(id: number): void;
 }
 
 class CommentRepository implements ICommentRepository {
+
     async getCommentsByRecipe(
-        recipeId: string,
-        from: number = 0,
-        limit: number = 20,
-        orderBy: 'date' | 'likes' = 'likes'
-    ): Promise<Comment[]> {
-        const comments = await db
+        recipeId: number,
+        from = 0,
+        limit = 10,
+        orderBy: 'date' | 'likes' = 'date'
+    ): Promise<RecipeComment[]> {
+        const result = await db
             .selectFrom('comment')
+            .where('recipe_id', "=", recipeId)
+            .innerJoin('account', 'comment.author_id', 'account.id')
             .select([
-                'id', 'userId', 'content', 'date', 'recipeId', 'likes', 'authorLike', 'pined'
+                // comment
+                'comment.id',
+                'content',
+                'date',
+                'author_id',
+                'likes',
+                'author_reply',
+                'author_like',
+                'pined',
+
+                // account
+                'account.id',
+                'account.name',
+                'account.image',
+                'account.verified'
             ])
-            .where('recipeId', '=', recipeId)
-            .orderBy('pined', 'desc')
             .orderBy(orderBy, 'desc')
             .limit(limit)
             .offset(from)
-            .execute();
+            .execute()
 
-        return comments.map((comment) => {
-            return {
-                id: comment.id,
-                userId: comment.userId,
-                content: comment.content,
-                date: comment.date,
-                recipeId: comment.recipeId,
-                likes: comment.likes,
-                authorLike: comment.authorLike,
-                pined: comment.pined,
-            };
-        });
+        return result.map((comment) => ({
+            id: comment.id,
+            content: comment.content,
+            date: comment.date.getDate(),
+            user: {
+                id: comment.author_id,
+                name: comment.name,
+                image: comment.image,
+                verified: comment.verified,
+            },
+            likes: comment.likes,
+            author_reply: comment.author_reply,
+            author_like: comment.author_like,
+            pined: comment.pined,
+        }))
     }
 
     createComment(
-        recipeId: string,
-        userId: string,
-        content: string,
-    ) {
-        db
-            .insertInto('comment')
+        recipeId: number,
+        userId: number,
+        content: string
+    ): void {
+        db.insertInto('comment')
             .values({
-                userId,
-                recipeId,
+                recipe_id: recipeId,
+                author_id: userId,
                 content,
-                pined: false,
-                authorLike: false,
-                likes: 0,
-                date: new Date()
             })
-            .returning('content')
             .execute();
     }
 
-    deleteComment(id: string) {
-        db
-            .deleteFrom('comment')
+    deleteComment(id: number): void {
+        db.deleteFrom('comment')
             .where('id', '=', id)
             .execute();
     }
 
-    pinComment(id: string) {
-        db
-            .updateTable('comment')
+    pinComment(id: number): void {
+        db.updateTable('comment')
             .set('pined', true)
             .where('id', '=', id)
             .execute();
     }
 
-    likeAsAuthor(id: string) {
-        db
-            .updateTable('comment')
-            .set('authorLike', true)
+    likeAsAuthor(id: number, content: string): void {
+        db.updateTable('comment')
+            .set('author_reply', content)
+            .where('id', '=', id)
+            .execute();
+    }
+
+    increaseLikes(id: number): void {
+        db.updateTable('comment')
+            .set((eb) => ({
+                likes: eb('likes', "+", 1),
+            }))
             .where('id', '=', id)
             .execute();
     }

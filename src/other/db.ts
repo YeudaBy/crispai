@@ -1,11 +1,11 @@
 import {RecipeTable} from "@/src/model/Recipe";
-import {AccountTable} from "@/src/model/User";
+import {AccountTable} from "@/src/model/Author";
 import {IngredientTable} from "@/src/model/Ingredient";
 import {StepTable} from "@/src/model/Step";
 import {CategoryTable} from "@/src/model/Category";
 import {EquipmentTable} from "@/src/model/Equipment";
 import {TagTable} from "@/src/model/Tag";
-import {CommentTable} from "@/src/model/Comment";
+import {CommentTable} from "@/src/model/RecipeComment";
 import {Kysely, PostgresDialect} from "kysely";
 import {Pool} from "pg";
 

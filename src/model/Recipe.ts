@@ -3,7 +3,8 @@ import {Tag} from "./Tag";
 import {Ingredient} from "@/src/model/Ingredient";
 import {Category} from "@/src/model/Category";
 import {Equipment} from "@/src/model/Equipment";
-import {User, UserPreview} from "./User";
+import {RecipeComment} from "@/src/model/RecipeComment";
+import {AuthorPreview} from "./Author";
 import {Generated} from "kysely";
 
 export type Recipe = {
@@ -11,10 +12,11 @@ export type Recipe = {
     title: string;
     description?: string;
     likes: number;
+    /* is number for serialization */
     date: number;
-    user: User;
+    author: AuthorPreview;
     image?: string;
-    comments: Comment[];
+    comments: RecipeComment[];
     ingredients: Ingredient[];
     steps: Step[];
     images: string[];
@@ -28,9 +30,10 @@ export type RecipePreview = {
     title: string;
     description?: string;
     image?: string;
+    /* is number for serialization */
     date: number;
     likes: number;
-    user: UserPreview;
+    author: AuthorPreview;
 }
 
 export interface RecipeTable {

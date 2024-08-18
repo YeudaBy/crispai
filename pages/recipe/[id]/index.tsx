@@ -20,7 +20,7 @@ export const getServerSideProps = (async (context) => {
 export default function Page({recipe}: InferGetServerSidePropsType<typeof getServerSideProps>) {
 
     const session = useSession()
-    const isOwner = session.data?.user?.id === recipe.user.id
+    const isOwner = session.data?.user?.id === recipe.author.id
 
     return (
         <>
@@ -56,7 +56,7 @@ export default function Page({recipe}: InferGetServerSidePropsType<typeof getSer
                 <div className={"p-4"}>
                     <h1 className={"text-3xl font-bold"}>{recipe.title}</h1>
                     <p>{recipe.description}</p>
-                    <p className={'text-sm opacity-65'}>{recipe.likes} Likes • {recipe.date} • {recipe.user.name}</p>
+                    <p className={'text-sm opacity-65'}>{recipe.likes} Likes • {recipe.date} • {recipe.author.name}</p>
                     <hr className={"my-2"}/>
                 </div>
 

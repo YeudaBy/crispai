@@ -23,8 +23,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         if (!!image) await recipeRepository.updateImage(numId, image);
         res.status(200).json({message: "Recipe updated"});
     } else {
-        const {title, description} = req.body || req.query;
-        const newId = await recipeRepository.createRecipe(title, description, userId);
+        const {title, description, image} = req.body || req.query;
+        const newId = await recipeRepository.createRecipe(title, description, userId, image);
         res.redirect(303, `/recipe/${newId}`);
     }
 }

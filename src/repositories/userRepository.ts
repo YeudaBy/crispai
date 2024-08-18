@@ -1,12 +1,12 @@
-import {User, UserPreview} from "../model/User";
+import {Author, AuthorPreview} from "../model/Author";
 import {db} from "../other/db";
 
 export interface IUserRepository {
-    getUser(id: number): Promise<User | undefined>;
+    getUser(id: number): Promise<Author | undefined>;
 
-    getUserPreview(id: number): Promise<UserPreview | undefined>;
+    getUserPreview(id: number): Promise<AuthorPreview | undefined>;
 
-    getUserByEmail(email: string): Promise<User | undefined>;
+    getUserByEmail(email: string): Promise<Author | undefined>;
 
     createUser(
         name: string,
@@ -37,7 +37,7 @@ export interface IUserRepository {
 }
 
 class UserRepository implements IUserRepository {
-    async getUser(id: number): Promise<User | undefined> {
+    async getUser(id: number): Promise<Author | undefined> {
         return db
             .selectFrom("account")
             .select(["id", "name", "email", "image", "bio", "verified"])
@@ -46,7 +46,7 @@ class UserRepository implements IUserRepository {
 
     }
 
-    async getUserPreview(id: number): Promise<UserPreview | undefined> {
+    async getUserPreview(id: number): Promise<AuthorPreview | undefined> {
         return db
             .selectFrom("account")
             .select(["id", "name", "image", "verified"])
@@ -54,7 +54,7 @@ class UserRepository implements IUserRepository {
             .executeTakeFirst();
     }
 
-    async getUserByEmail(email: string): Promise<User | undefined> {
+    async getUserByEmail(email: string): Promise<Author | undefined> {
         return db
             .selectFrom("account")
             .select(["id", "name", "email", "image", "bio", "verified"])

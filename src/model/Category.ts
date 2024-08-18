@@ -1,13 +1,13 @@
 import {Generated} from "kysely";
 
 export type Category = {
-    id: string;
+    id: number;
     name: string;
     image?: string;
 }
 
 export interface CategoryTable {
-    id: Generated<string>
+    id: Generated<number>
     name: string
     image: string
 }

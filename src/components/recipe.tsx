@@ -20,10 +20,10 @@ export function RecipeCard({recipe}: { recipe: RecipePreview }) {
                 <p className="text-sm">{recipe.description}</p>
                 <hr className={"my-2"}/>
                 <div className="flex justify-between items-center mt-2">
-                    <Link href={"/author/" + recipe.user.id}>
+                    <Link href={"/author/" + recipe.author.id}>
                         <div className="flex gap-2 items-center">
-                            <img src={recipe.user.image} alt={recipe.user.name} className="w-8 h-8 rounded-full"/>
-                            <p className={'text-sm'}>{recipe.user.name}</p>
+                            <img src={recipe.author.image} alt={recipe.author.name} className="w-8 h-8 rounded-full"/>
+                            <p className={'text-sm'}>{recipe.author.name}</p>
                         </div>
                     </Link>
                     <div className={"flex justify-between items-center gap-2"}>

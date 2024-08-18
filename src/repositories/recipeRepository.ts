@@ -1,7 +1,9 @@
 import {Recipe, RecipePreview} from "@/src/model/Recipe";
-import {User} from "../model/User";
+import {Author} from "../model/Author";
 import {db} from "../other/db";
 import {userRepository} from "@/src/repositories/userRepository";
+import {Ingredient} from "@/src/model/Ingredient";
+import {commentRepository} from "@/src/repositories/commentRepository";
 
 export interface IRecipeRepository {
     getRecipe(id: number): Promise<Recipe | undefined>;
@@ -39,7 +41,7 @@ export interface IRecipeRepository {
 
     getLikedRecipes(userId: number): Promise<RecipePreview[]>;
 
-    getUsersWhoLiked(id: number): Promise<User[]>;
+    getUsersWhoLiked(id: number): Promise<Author[]>;
 }
 
 class RecipeRepository implements IRecipeRepository {
@@ -47,17 +49,26 @@ class RecipeRepository implements IRecipeRepository {
         const recipe = await db
             .selectFrom('recipe')
             .leftJoin('recipe_like', 'recipe.id', 'recipe_like.recipe_id')
+            .innerJoin('account', 'recipe.author', 'account.id')
             .select(({fn}) => [
-                'recipe.id',
+                // recipe
+                'recipe.id as recipe_id',
                 'recipe.title',
                 'recipe.description',
                 'recipe.date',
                 'recipe.author',
                 'recipe.image',
+
+                // author
+                'account.id as user_id',
+                'account.name',
+                'account.image as user_image',
+                'account.verified',
+
                 fn.count('recipe_like.user_id').as('likes_count')
             ])
             .where('recipe.id', '=', id)
-            .groupBy('recipe.id')
+            .groupBy(['recipe.id', 'account.id'])
             .executeTakeFirst();
 
 
@@ -65,21 +76,24 @@ class RecipeRepository implements IRecipeRepository {
             return undefined
         }
 
-        const user = await userRepository.getUser(recipe.author)
-        if (!user) {
-            throw new Error('User not found')
-        }
+        const ingredients = await this.getRecipeIngredients(id);
+        const comments = await commentRepository.getCommentsByRecipe(id);
 
         return {
-            id: recipe.id,
+            id: recipe.recipe_id,
             title: recipe.title,
             description: recipe.description,
             likes: Number(recipe.likes_count),
             image: recipe.image,
             date: recipe.date.getDate(),
-            user: user,
-            comments: [],
-            ingredients: [],
+            author: {
+                id: recipe.user_id,
+                name: recipe.name,
+                image: recipe.user_image,
+                verified: recipe.verified,
+            },
+            comments,
+            ingredients,
             steps: [],
             images: [],
             categories: [],
@@ -92,26 +106,30 @@ class RecipeRepository implements IRecipeRepository {
         const recipe = await db
             .selectFrom('recipe')
             .leftJoin('recipe_like', 'recipe.id', 'recipe_like.recipe_id')
-            .select(({fn, val}) => [
+            .innerJoin('account', 'recipe.author', 'account.id')
+            .select(({fn}) => [
+                // recipe
                 'recipe.id',
-                'title',
-                'description',
-                'date',
-                'author',
+                'recipe.title',
+                'recipe.description',
+                'recipe.date',
+                'recipe.author',
                 'recipe.image',
+
+                // author
+                'account.id as user_id',
+                'account.name',
+                'account.image as user_image',
+                'account.verified',
+
                 fn.count('recipe_like.user_id').as('likes_count')
             ])
-            .groupBy('recipe.id')
+            .groupBy(['recipe.id', 'account.id'])
             .where('recipe.id', '=', id)
             .executeTakeFirst();
 
         if (!recipe) {
             return undefined
-        }
-
-        const user = await userRepository.getUserPreview(recipe.author)
-        if (!user) {
-            throw new Error('User not found')
         }
 
         return {
@@ -120,7 +138,12 @@ class RecipeRepository implements IRecipeRepository {
             description: recipe.description,
             image: recipe.image,
             date: recipe.date.getDate(),
-            user: user,
+            author: {
+                id: recipe.user_id,
+                name: recipe.name,
+                image: recipe.user_image,
+                verified: recipe.verified,
+            },
             likes: Number(recipe.likes_count),
         }
     }
@@ -281,7 +304,7 @@ class RecipeRepository implements IRecipeRepository {
         return recipes.filter((recipe): recipe is Recipe => recipe !== undefined)
     }
 
-    async getUsersWhoLiked(id: number): Promise<User[]> {
+    async getUsersWhoLiked(id: number): Promise<Author[]> {
         const ids = await db
             .selectFrom('recipe_like')
             .select(['user_id'])
@@ -292,7 +315,15 @@ class RecipeRepository implements IRecipeRepository {
             return userRepository.getUser(user.user_id);
         }));
 
-        return users.filter((user): user is User => user !== undefined)
+        return users.filter((user): user is Author => user !== undefined)
+    }
+
+    private async getRecipeIngredients(id: number): Promise<Ingredient[]> {
+        return db
+            .selectFrom('ingredient')
+            .select(['id', 'name', 'amount', 'unit', "required"])
+            .where('recipe_id', '=', id)
+            .execute();
     }
 }
 

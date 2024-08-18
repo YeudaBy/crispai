@@ -1,13 +1,13 @@
 import {Generated} from "kysely";
 
 export type Equipment = {
-    id: string;
+    id: number;
     name: string;
     image?: string;
 }
 
 export interface EquipmentTable {
-    id: Generated<string>
+    id: Generated<number>
     name: string
     image: string
 }

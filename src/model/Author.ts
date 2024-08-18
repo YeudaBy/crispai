@@ -1,6 +1,6 @@
 import {Generated} from "kysely";
 
-export type User = {
+export type Author = {
     id: number;
     email: string;
     name: string;
@@ -9,7 +9,7 @@ export type User = {
     verified: boolean;
 }
 
-export type UserPreview = {
+export type AuthorPreview = {
     id: number;
     name: string;
     image?: string;

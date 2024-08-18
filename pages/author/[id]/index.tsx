@@ -1,7 +1,7 @@
 import {recipeRepository} from "@/src/repositories/recipeRepository";
 import {GetServerSideProps, InferGetServerSidePropsType} from "next";
 import {RecipePreview} from "@/src/model/Recipe";
-import {User} from "@/src/model/User";
+import {Author} from "@/src/model/Author";
 import {userRepository} from "@/src/repositories/userRepository";
 import {RecipeCard} from "@/src/components/recipe";
 
@@ -17,7 +17,7 @@ export const getServerSideProps = (async (context) => {
     }
     return {props: {recipes, user}}
 }) satisfies GetServerSideProps<{
-    user: User,
+    user: Author,
     recipes: RecipePreview[]
 }>
 
