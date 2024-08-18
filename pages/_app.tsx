@@ -14,8 +14,9 @@ export default function App({
                                 Component,
                                 pageProps: {session, ...pageProps},
                             }: AppProps) {
+    const isHome = Component.name === "Home";
     return <SessionProvider session={session}>
-        <Layout font={inter}>
+        <Layout font={inter} isHome={isHome}>
             <Component {...pageProps} />
         </Layout>
     </SessionProvider>

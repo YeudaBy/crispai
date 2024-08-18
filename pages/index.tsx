@@ -17,8 +17,6 @@ export default function Home(props: {
     console.log(props)
     return (
         <>
-            <Image src={"/crispai.svg"} width={200} height={200} alt={"Crispai Logo"} className={"mx-auto"}/>
-
             <form className="flex m-2 justify-center gap-2" onSubmit={e => {
                 e.preventDefault()
                 if (query !== '') {
