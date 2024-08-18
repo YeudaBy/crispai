@@ -3,8 +3,11 @@ import {GetServerSideProps, InferGetServerSidePropsType} from "next";
 import {RecipePreview} from "@/src/model/Recipe";
 import {userRepository} from "@/src/repositories/userRepository";
 import {User} from "@/src/model/User";
-import {RecipeCard} from "@/src/components/recipe";
 import {auth} from "@/pages/api/auth/[...nextauth]";
+import React from "react";
+import {Dialog} from "@/src/components/dialog";
+import {UploadButton} from "@/src/components/uploadthing";
+import {Icon, RecipeCard} from "@/src/components/recipe";
 
 export const getServerSideProps = (async (context) => {
     const session = await auth(context.req, context.res);
@@ -21,6 +24,7 @@ export const getServerSideProps = (async (context) => {
         return {notFound: true}
     }
 
+    console.log(user)
     return {props: {recipes, user}}
 }) satisfies GetServerSideProps<{
     recipes: RecipePreview[],
@@ -29,19 +33,110 @@ export const getServerSideProps = (async (context) => {
 
 
 export default function Page({recipes, user}: InferGetServerSidePropsType<typeof getServerSideProps>) {
-    return (
-        <main>
-            <h1>{user.name}</h1>
-            <p>{user.email}</p>
+    const [profileDialogOpen, setProfileDialogOpen] = React.useState(false);
+    const [newName, setNewName] = React.useState("");
 
-            <div>
-                <h2>Recipes</h2>
-                <ul>
-                    {recipes.map((recipe) => (
-                        <RecipeCard recipe={recipe} key={recipe.id}/>
-                    ))}
-                </ul>
+    console.log(recipes)
+    return (
+        <>
+            <div className={"flex flex-row gap-2 p-2 items-center"}>
+                <div
+                    onClick={() => setProfileDialogOpen(true)}
+                    className={"rounded-full h-20 w-20 overflow-hidden border-4 border-pastelBlue-400"}>
+                    {
+                        user.image ?
+                            <img src={user.image} alt={user.name}/> :
+                            <div className={"flex justify-center items-center h-full"}>
+                                <span className={"text-3xl"}>{user.name[0]}</span>
+                            </div>
+                    }
+                </div>
+
+                <div className={"grow"}>
+                    {
+                        newName.length > 0 ?
+                            <input
+                                type={"text"}
+                                value={newName}
+                                onChange={(e) => setNewName(e.target.value)}
+                                onBlur={() => {
+                                    setNewName("")
+                                    fetch("/api/author/name", {
+                                        method: "POST",
+                                        body: JSON.stringify({name: newName}),
+                                    })
+                                }}
+                            />
+                            : <h1 className={"font-bold"} onClick={() => setNewName(user.name)}>{user.name}</h1>
+                    }
+                    <p className={"text-sm font-light"}>{user.email}</p>
+                    {user.bio && <p dangerouslySetInnerHTML={{__html: user.bio}}></p>}
+                </div>
+
+                <div className={"flex flex-col gap-2 items-center"}>
+                    <Icon/>
+                    <p className={"text-sm"}>Settings</p>
+                </div>
             </div>
-        </main>
+
+            <div className={"flex flex-row gap-2 p-2 items-center"}>
+                <div className={"flex flex-col gap-2"}>
+                    <h1 className={"font-bold"}>Bio</h1>
+                    <p>{user.bio}</p>
+                </div>
+            </div>
+
+            <div className={"flex flex-row gap-2 p-2 items-center justify-around"}>
+                <div className={"flex flex-col items-center"}>
+                    <p className={"text-sm"}>Recipes</p>
+                    <p className={"font-bold"}>{recipes.length}</p>
+                </div>
+                <div className={"flex flex-col items-center"}>
+                    <p className={"text-sm"}>Followers</p>
+                    <p className={"font-bold"}>0</p>
+                </div>
+                <div className={"flex flex-col items-center"}>
+                    <p className={"text-sm"}>Following</p>
+                    <p className={"font-bold"}>0</p>
+                </div>
+            </div>
+
+            <div className={"flex flex-col gap-2 p-2 items-center"}>
+                {recipes.map((recipe) => (
+                    <div key={recipe.id}>
+                        <RecipeCard recipe={recipe}/>
+                    </div>
+                ))}
+            </div>
+
+            <Dialog
+                open={profileDialogOpen}
+                onClose={() => setProfileDialogOpen(false)}
+                className={"rounded-3xl p-6 shadow-2xl bg-pastelBlue-50"}
+                title={"Change Image Picture"}>
+                <div>
+                    <UploadButton
+                        endpoint={"imageUploader"}
+                        className={"ut-button:bg-pastelBlue-700 ut-button:rounded-full m-4"}
+                        onClientUploadComplete={(res) => {
+                            fetch("/api/author/image", {
+                                method: "POST",
+                                body: JSON.stringify({url: res[0].url}),
+                            })
+                        }}
+                    />
+                    <hr/>
+                    <button
+                        onClick={() => {
+                            setProfileDialogOpen(false);
+                            fetch("/api/author/image", {method: "DELETE",})
+                        }}
+                        className={"border-2 border-pastelBlue-400 px-4 rounded-full text-sm py-1"}
+                    >
+                        Remove Image
+                    </button>
+                </div>
+            </Dialog>
+        </>
     )
 }

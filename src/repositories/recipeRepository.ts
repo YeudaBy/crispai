@@ -22,11 +22,14 @@ export interface IRecipeRepository {
         title: string,
         description: string,
         userId: number,
+        image?: string
     ): Promise<number>;
 
     updateTitle(id: number, title: string): Promise<void>;
 
     updateDescription(id: number, description: string): Promise<void>;
+
+    updateImage(id: number, image: string): Promise<void>;
 
     deleteRecipe(id: number): void;
 
@@ -50,6 +53,7 @@ class RecipeRepository implements IRecipeRepository {
                 'recipe.description',
                 'recipe.date',
                 'recipe.author',
+                'recipe.image',
                 fn.count('recipe_like.user_id').as('likes_count')
             ])
             .where('recipe.id', '=', id)
@@ -71,6 +75,7 @@ class RecipeRepository implements IRecipeRepository {
             title: recipe.title,
             description: recipe.description,
             likes: Number(recipe.likes_count),
+            image: recipe.image,
             date: recipe.date.getDate(),
             user: user,
             comments: [],
@@ -86,9 +91,17 @@ class RecipeRepository implements IRecipeRepository {
     async getRecipePreview(id: number): Promise<RecipePreview | undefined> {
         const recipe = await db
             .selectFrom('recipe')
+            .leftJoin('recipe_like', 'recipe.id', 'recipe_like.recipe_id')
             .select(({fn, val}) => [
-                'id', 'title', 'description', 'author', 'date',
+                'recipe.id',
+                'title',
+                'description',
+                'date',
+                'author',
+                'recipe.image',
+                fn.count('recipe_like.user_id').as('likes_count')
             ])
+            .groupBy('recipe.id')
             .where('recipe.id', '=', id)
             .executeTakeFirst();
 
@@ -105,8 +118,10 @@ class RecipeRepository implements IRecipeRepository {
             id: recipe.id,
             title: recipe.title,
             description: recipe.description,
+            image: recipe.image,
             date: recipe.date.getDate(),
             user: user,
+            likes: Number(recipe.likes_count),
         }
     }
 
@@ -116,10 +131,10 @@ class RecipeRepository implements IRecipeRepository {
             .leftJoin('recipe_like', 'recipe.id', 'recipe_like.recipe_id')
             .select(({fn, val}) => [
                 'id',
-                fn.count<number>(val('recipe_like.user_id')).as('likes'),
+                fn.count('recipe_like.user_id').as('likes_count')
             ])
             .groupBy('recipe.id')
-            .orderBy('likes', 'desc')
+            .orderBy('likes_count', 'desc')
             .execute();
 
         const recipes = await Promise.all(ids.map(async (recipe) => {
@@ -181,7 +196,8 @@ class RecipeRepository implements IRecipeRepository {
     async createRecipe(
         title: string,
         description: string,
-        userId: number
+        userId: number,
+        image?: string
     ): Promise<number> {
         const newRecipe = await db
             .insertInto('recipe')
@@ -190,6 +206,7 @@ class RecipeRepository implements IRecipeRepository {
                 description,
                 author: userId,
                 date: new Date(),
+                image,
             })
             .returning('id')
             .executeTakeFirst();
@@ -213,6 +230,14 @@ class RecipeRepository implements IRecipeRepository {
         await db
             .updateTable('recipe')
             .set('description', description)
+            .where('id', '=', id)
+            .execute();
+    }
+
+    async updateImage(id: number, image: string): Promise<void> {
+        await db
+            .updateTable('recipe')
+            .set('image', image)
             .where('id', '=', id)
             .execute();
     }

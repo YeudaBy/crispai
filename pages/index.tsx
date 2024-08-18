@@ -1,8 +1,8 @@
 import {RecipePreview} from "@/src/model/Recipe";
 import React from "react";
-import {Icon} from "@/src/components/recipe";
+import {Icon, RecipeCard} from "@/src/components/recipe";
 import {useRouter} from "next/router";
-import {BottomNavBar} from "@/src/components/Layout";
+import {recipeRepository} from "@/src/repositories/recipeRepository";
 
 
 export default function Home(props: { byLikes: RecipePreview[] }) {
@@ -10,10 +10,10 @@ export default function Home(props: { byLikes: RecipePreview[] }) {
     const router = useRouter()
     return (
         <>
-            <h1 className="text-4xl font-bold text-center">Welcome to <span
-                className={'text-amber-500'}>CrispAI</span>
+            <h1 className="text-4xl font-bold text-center mt-4">Welcome to <span
+                className={'text-pastelPurple-700'}>CrispAI</span>
             </h1>
-            <p className="text-lg grow text-center">The future of <span className={'text-amber-500'}>AI</span> is
+            <p className="text-lg grow text-center">The future of <span className={'text-pastelPurple-700'}>AI</span> is
                 here</p>
 
             <form className="flex m-2 p-2 justify-center" onSubmit={e => {
@@ -30,18 +30,23 @@ export default function Home(props: { byLikes: RecipePreview[] }) {
                     <Icon/>
                 </button>
             </form>
+
+            <h2 className="text-2xl font-bold text-center">Most Liked Recipes</h2>
+            <div className={"flex flex-wrap gap-4 justify-center"}>
+                {props.byLikes?.map((recipe) => (
+                    <RecipeCard recipe={recipe} key={recipe.id}/>
+                ))}
+            </div>
         </>
     );
 }
 
-
 export async function getServerSideProps() {
-    // const byLikes = await recipeRepository.getRecipesByLikes()
-    console.log("test")
+    const byLikes = await recipeRepository.getRecipesByLikes()
 
     return {
         props: {
-            // byLikes
+            byLikes
         }
     }
 }

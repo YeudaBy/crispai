@@ -2,7 +2,7 @@ import "@/styles/globals.css";
 import "@/styles/styles.scss";
 import type {AppProps} from "next/app";
 import {SessionProvider} from "next-auth/react";
-import {Layout} from "@/src/components/Layout";
+import {Layout} from "@/src/components/layout";
 
 export default function App({
                                 Component,

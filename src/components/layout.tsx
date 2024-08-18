@@ -2,6 +2,7 @@ import React from "react";
 import {Inter} from "next/font/google";
 import Link from "next/link";
 import {Icon} from "@/src/components/recipe";
+import {vibrate} from "@/src/other/utils";
 
 const inter = Inter({subsets: ["latin"]});
 
@@ -11,9 +12,6 @@ export function Layout({children}: { children: React.ReactNode }) {
             <section className={'grow'}>
                 {children}
             </section>
-            <div className={'shadow-button m-16 p-2 text-center rounded-3xl'}>
-                test
-            </div>
             <BottomNavBar/>
         </main>
     );

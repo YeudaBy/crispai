@@ -13,6 +13,7 @@ export type Recipe = {
     likes: number;
     date: number;
     user: User;
+    image?: string;
     comments: Comment[];
     ingredients: Ingredient[];
     steps: Step[];
@@ -28,6 +29,7 @@ export type RecipePreview = {
     description?: string;
     image?: string;
     date: number;
+    likes: number;
     user: UserPreview;
 }
 
@@ -35,6 +37,7 @@ export interface RecipeTable {
     id: Generated<number>
     title: string
     description?: string
+    image?: string;
     date: Date
     author: number
     avgEstimate?: number

@@ -6,8 +6,13 @@ export function RecipeCard({recipe}: { recipe: RecipePreview }) {
     return (
         <div
             className="shadow-lg rounded-br-3xl rounded-tl-3xl hover:translate-x-2 transform transition-all duration-300 overflow-hidden">
-            <img src={recipe.image} alt={recipe.title}
-                 className="rounded-tl-3xl w-full h-48 object-cover hover:scale-x-105 transform transition-all duration-300"/>
+            {!!recipe.image ? <img src={recipe.image} alt={recipe.title}
+                                   className="rounded-tl-3xl w-full h-48 object-cover hover:scale-x-105 transform transition-all duration-300"/>
+                : <div className="w-full h-48 bg-pastelMint-100 rounded-tl-3xl">
+                    <p className={"rotate-12 text-center py-4 font-bold"}>C r i s p a i</p>
+                    <p className={"rotate-12 text-center py-4 font-bold"}>C r i s p a i</p>
+                    <p className={"rotate-12 text-center py-4 font-bold"}>C r i s p a i</p>
+                </div>}
             <div className={'p-4'}>
                 <Link href={`/recipe/${recipe.id}`}>
                     <h2 className="text-xl font-bold hover:underline">{recipe.title}</h2>
@@ -45,7 +50,7 @@ export function RecipeCard({recipe}: { recipe: RecipePreview }) {
 export function Icon({className}: { className?: string }) {
     return (
         <div
-            className={`${className} w-8 blur-sm h-8 bg-pastelLavender-200 rounded-full shadow-innerXl bg-transparent border-pastelLavender-400 border-2`}></div>
+            className={`${className} w-8 blur-sm h-8 bg-pastelLavender-700 rounded-full shadow-innerXl bg-transparent border-pastelLavender-400 border-2`}></div>
     )
 }
 

@@ -24,6 +24,16 @@ export interface IUserRepository {
         image?: string,
         bio?: string,
     ): Promise<number>;
+
+    changeImage(userId: number, url: string | undefined): Promise<void>;
+
+    changeBio(userId: number, bio: string): Promise<void>;
+
+    changeName(userId: number, name: string): Promise<void>;
+
+    changeEmail(userId: number, email: string): Promise<void>;
+
+    changePassword(userId: number, password: string): Promise<void>;
 }
 
 class UserRepository implements IUserRepository {
@@ -104,6 +114,46 @@ class UserRepository implements IUserRepository {
         }
 
         return newUser.id;
+    }
+
+    async changeImage(userId: number, url: string | undefined): Promise<void> {
+        await db
+            .updateTable("account")
+            .set("image", url)
+            .where("id", "=", userId)
+            .execute();
+    }
+
+    async changeBio(userId: number, bio: string): Promise<void> {
+        await db
+            .updateTable("account")
+            .set("bio", bio)
+            .where("id", "=", userId)
+            .execute();
+    }
+
+    async changeName(userId: number, name: string): Promise<void> {
+        await db
+            .updateTable("account")
+            .set("name", name)
+            .where("id", "=", userId)
+            .execute();
+    }
+
+    async changeEmail(userId: number, email: string): Promise<void> {
+        await db
+            .updateTable("account")
+            .set("email", email)
+            .where("id", "=", userId)
+            .execute();
+    }
+
+    async changePassword(userId: number, password: string): Promise<void> {
+        await db
+            .updateTable("account")
+            .set("password", password)
+            .where("id", "=", userId)
+            .execute();
     }
 }
 

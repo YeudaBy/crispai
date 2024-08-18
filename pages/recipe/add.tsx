@@ -7,7 +7,7 @@ export default function AddRecipe() {
         return (
             <div>
                 <h1>Add a recipe</h1>
-                <form action={"/api/add_recipe"} method={"post"}
+                <form action={"/api/recipe"} method={"PUT"}
                       className={"rounded-xl bg-pastelLavender-50 flex flex-col gap-3 p-4 m-2"}>
                     <label htmlFor="title">Title</label>
                     <input type="text" id="title" name="title" required/>
