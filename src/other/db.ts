@@ -19,9 +19,9 @@ export interface Database {
     tag: TagTable,
     comment: CommentTable,
 
-    recipeLike: {
-        recipeId: number,
-        userId: number,
+    recipe_like: {
+        recipe_id: number,
+        user_id: number,
     },
 }
 

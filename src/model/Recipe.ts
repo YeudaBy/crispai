@@ -11,7 +11,7 @@ export type Recipe = {
     title: string;
     description?: string;
     likes: number;
-    date: Date;
+    date: number;
     user: User;
     comments: Comment[];
     ingredients: Ingredient[];
@@ -27,11 +27,8 @@ export type RecipePreview = {
     title: string;
     description?: string;
     image?: string;
-    likes: number;
-    date: Date;
+    date: number;
     user: UserPreview;
-    categories: Category[];
-    tags: Tag[];
 }
 
 export interface RecipeTable {

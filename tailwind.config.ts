@@ -5,6 +5,7 @@ const config: Config = {
         "./pages/**/*.{js,ts,jsx,tsx,mdx}",
         "./components/**/*.{js,ts,jsx,tsx,mdx}",
         "./app/**/*.{js,ts,jsx,tsx,mdx}",
+        "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
     ],
     theme: {
         extend: {
@@ -105,10 +106,23 @@ const config: Config = {
                     800: '#4D2B80',
                     900: '#371F5B',
                 },
+                wood: {
+                    50: '#F5F5F5',
+                    100: '#E8E8E8',
+                    200: '#D0B29A',
+                    300: '#8E735B',
+                    400: '#5B3A29',
+                    500: '#3C2A1B',
+                    600: '#2E1F15',
+                    700: '#1F1610',
+                    800: '#14100B',
+                    900: '#0E0A07',
+                },
             },
             boxShadow: {
-                innerMd: "inset 2px 1px 4px 2px rgba(0, 0, 0, 0.1)",
-                innerXl: "inset 2px 1px 10px 4px #D3C1FE",
+                'inner-xs-wood': 'inset 1px 1px 2px 1px var(--color-wood-50)',
+                test: 'rgb(204, 219, 232) 3px 3px 6px 0px inset, rgba(255, 255, 255, 0.5) -3px -3px 6px 1px inset;',
+                button: 'rgba(0, 0, 0, 0.17) 0px -2px 6px 0px inset, rgba(0, 0, 0, 0.15) 0px -12px 20px 0px inset, rgba(0, 0, 0, 0.1) 0px -22px 23px 0px inset, rgba(0, 0, 0, 0.06) 0px 2px 1px, rgba(0, 0, 0, 0.09) 0px 4px 2px, rgba(0, 0, 0, 0.09) 0px 8px 4px, rgba(0, 0, 0, 0.09) 0px 1px 3px, rgba(0, 0, 0, 0.09) 0px 3px 4px'
             }
         },
     },

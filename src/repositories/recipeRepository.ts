@@ -43,13 +43,19 @@ class RecipeRepository implements IRecipeRepository {
     async getRecipe(id: number): Promise<Recipe | undefined> {
         const recipe = await db
             .selectFrom('recipe')
-            .leftJoin('recipeLike', 'recipe.id', 'recipeLike.recipeId')
-            .select(({fn, val}) => [
-                'id', 'title', 'description', 'recipe.author', 'date',
-                fn.count<number>(val('recipeLike.userId')).as('likes'),
+            .leftJoin('recipe_like', 'recipe.id', 'recipe_like.recipe_id')
+            .select(({fn}) => [
+                'recipe.id',
+                'recipe.title',
+                'recipe.description',
+                'recipe.date',
+                'recipe.author',
+                fn.count('recipe_like.user_id').as('likes_count')
             ])
             .where('recipe.id', '=', id)
+            .groupBy('recipe.id')
             .executeTakeFirst();
+
 
         if (!recipe) {
             return undefined
@@ -64,8 +70,8 @@ class RecipeRepository implements IRecipeRepository {
             id: recipe.id,
             title: recipe.title,
             description: recipe.description,
-            likes: recipe.likes,
-            date: recipe.date,
+            likes: Number(recipe.likes_count),
+            date: recipe.date.getDate(),
             user: user,
             comments: [],
             ingredients: [],
@@ -80,10 +86,8 @@ class RecipeRepository implements IRecipeRepository {
     async getRecipePreview(id: number): Promise<RecipePreview | undefined> {
         const recipe = await db
             .selectFrom('recipe')
-            .leftJoin('recipeLike', 'recipe.id', 'recipeLike.recipeId')
             .select(({fn, val}) => [
-                'id', 'title', 'description', 'recipe.author', 'date',
-                fn.count<number>(val('recipeLike.userId')).as('likes'),
+                'id', 'title', 'description', 'author', 'date',
             ])
             .where('recipe.id', '=', id)
             .executeTakeFirst();
@@ -101,21 +105,18 @@ class RecipeRepository implements IRecipeRepository {
             id: recipe.id,
             title: recipe.title,
             description: recipe.description,
-            likes: recipe.likes,
-            date: recipe.date,
+            date: recipe.date.getDate(),
             user: user,
-            categories: [],
-            tags: [],
         }
     }
 
     async getRecipesByLikes(): Promise<RecipePreview[]> {
         const ids = await db
             .selectFrom('recipe')
-            .leftJoin('recipeLike', 'recipe.id', 'recipeLike.recipeId')
+            .leftJoin('recipe_like', 'recipe.id', 'recipe_like.recipe_id')
             .select(({fn, val}) => [
                 'id',
-                fn.count<number>(val('recipeLike.userId')).as('likes'),
+                fn.count<number>(val('recipe_like.user_id')).as('likes'),
             ])
             .groupBy('recipe.id')
             .orderBy('likes', 'desc')
@@ -152,7 +153,7 @@ class RecipeRepository implements IRecipeRepository {
             .execute();
 
         const recipes = await Promise.all(ids.map(async (recipe) => {
-            return this.getRecipe(recipe.id);
+            return this.getRecipePreview(recipe.id);
         }));
 
         return recipes.filter((recipe): recipe is Recipe => recipe !== undefined)
@@ -171,7 +172,7 @@ class RecipeRepository implements IRecipeRepository {
             .execute();
 
         const recipes = await Promise.all(ids.map(async (recipe) => {
-            return this.getRecipe(recipe.id);
+            return this.getRecipePreview(recipe.id);
         }));
 
         return recipes.filter((recipe): recipe is Recipe => recipe !== undefined)
@@ -225,31 +226,31 @@ class RecipeRepository implements IRecipeRepository {
 
     likeRecipe(id: number, userId: number) {
         db
-            .insertInto('recipeLike')
+            .insertInto('recipe_like')
             .values({
-                recipeId: id,
-                userId: userId,
+                recipe_id: id,
+                user_id: userId,
             })
             .execute();
     }
 
     unlikeRecipe(id: number, userId: number) {
         db
-            .deleteFrom('recipeLike')
-            .where('recipeId', '=', id)
-            .where('userId', '=', userId)
+            .deleteFrom('recipe_like')
+            .where('recipe_id', '=', id)
+            .where('user_id', '=', userId)
             .execute();
     }
 
     async getLikedRecipes(userId: number): Promise<Recipe[]> {
         const ids = await db
-            .selectFrom('recipeLike')
-            .select(['recipeId'])
-            .where('userId', '=', userId)
+            .selectFrom('recipe_like')
+            .select(['recipe_id'])
+            .where('user_id', '=', userId)
             .execute();
 
         const recipes = await Promise.all(ids.map(async (recipe) => {
-            return this.getRecipe(recipe.recipeId);
+            return this.getRecipe(recipe.recipe_id);
         }));
 
         return recipes.filter((recipe): recipe is Recipe => recipe !== undefined)
@@ -257,13 +258,13 @@ class RecipeRepository implements IRecipeRepository {
 
     async getUsersWhoLiked(id: number): Promise<User[]> {
         const ids = await db
-            .selectFrom('recipeLike')
-            .select(['userId'])
-            .where('recipeId', '=', id)
+            .selectFrom('recipe_like')
+            .select(['user_id'])
+            .where('recipe_id', '=', id)
             .execute();
 
         const users = await Promise.all(ids.map(async (user) => {
-            return userRepository.getUser(user.userId);
+            return userRepository.getUser(user.user_id);
         }));
 
         return users.filter((user): user is User => user !== undefined)
