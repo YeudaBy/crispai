@@ -1,7 +1,7 @@
 import {Generated} from "kysely";
 
 export type Ingredient = {
-    id: string;
+    id: number;
     name: string;
     amount: string;
     unit: string;
@@ -10,7 +10,7 @@ export type Ingredient = {
 
 export interface IngredientTable {
     recipe_id: number
-    id: Generated<string>
+    id: Generated<number>
     name: string
     amount: string
     unit: string
