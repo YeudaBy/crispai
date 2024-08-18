@@ -1,40 +1,55 @@
 import {RecipePreview} from "@/src/model/Recipe";
 import React from "react";
-import {Icon, RecipeCard} from "@/src/components/recipe";
+import {RecipeCardLarge} from "@/src/components/recipe";
 import {useRouter} from "next/router";
 import {recipeRepository} from "@/src/repositories/recipeRepository";
+import Image from "next/image";
+import {Tag} from "@/src/model/Tag";
+import Link from "next/link";
 
 
-export default function Home(props: { byLikes: RecipePreview[] }) {
+export default function Home(props: {
+    byLikes: RecipePreview[],
+    tags: Tag[]
+}) {
     const [query, setQuery] = React.useState<string>('')
     const router = useRouter()
+    console.log(props)
     return (
         <>
-            <h1 className="text-4xl font-bold text-center mt-4">Welcome to <span
-                className={'text-pastelPurple-700'}>CrispAI</span>
-            </h1>
-            <p className="text-lg grow text-center">The future of <span className={'text-pastelPurple-700'}>AI</span> is
-                here</p>
+            <Image src={"/crispai.svg"} width={200} height={200} alt={"Crispai Logo"} className={"mx-auto"}/>
 
-            <form className="flex m-2 p-2 justify-center" onSubmit={e => {
+            <form className="flex m-2 justify-center gap-2" onSubmit={e => {
                 e.preventDefault()
                 if (query !== '') {
                     router.push(`/search/${query}`)
                 }
             }}>
                 <input type="text" placeholder={'Search'} value={query} onChange={(e) => setQuery(e.target.value)}
-                       className="border-4 border-wood-300 rounded-tl-full rounded-bl-full text-xl w-full text-pastelLavender-700 p-2"/>
-                <button
-                    className="px-6 py-2 bg-pastelLavender-200 rounded-tr-full rounded-br-full p-2 text-pastelPurple-800 flex flex-row gap-3 items-center justify-center">
-                    Search
-                    <Icon/>
+                       className={"rounded-full bg-neutral-200 border-2 w-full text-sm p-2"}/>
+
+                <button type="submit" className={"bg-neutral-200 border-2 text-white rounded-full p-2"}>
+                    <Image src={"/pan-icon.svg"} width={30} height={30} alt={"Search Icon"}/>
                 </button>
             </form>
 
-            <h2 className="text-2xl font-bold text-center">Most Liked Recipes</h2>
-            <div className={"flex flex-wrap gap-4 justify-center"}>
+            <div className={"flex gap-2 flex-wrap p-2"}>
+                {props.tags?.map((tag) => (
+                    <Link key={tag.id} href={`/tag/${tag.id}`} className={"w-fit"}>
+                        <div
+                            className={"flex gap-1 justify-center items-center bg-neutral-300 rounded-full w-fit px-2"}>
+                            <Image src={tag.image
+                                ? tag.image
+                                : "/default-tag.svg"} width={32} height={32} alt={tag.name}/>
+                            {tag.name}
+                        </div>
+                    </Link>)
+                )}
+            </div>
+
+            <div className={"flex flex-wrap p-2 gap-4 justify-center"}>
                 {props.byLikes?.map((recipe) => (
-                    <RecipeCard recipe={recipe} key={recipe.id}/>
+                    <RecipeCardLarge recipe={recipe} key={recipe.id}/>
                 ))}
             </div>
         </>
@@ -43,10 +58,11 @@ export default function Home(props: { byLikes: RecipePreview[] }) {
 
 export async function getServerSideProps() {
     const byLikes = await recipeRepository.getRecipesByLikes()
+    const tags = await recipeRepository.getTags()
 
     return {
         props: {
-            byLikes
+            byLikes, tags
         }
     }
 }

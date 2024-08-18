@@ -1,13 +1,13 @@
 import {Generated} from "kysely";
 
 export type Tag = {
-    id: string;
+    id: number;
     name: string;
     image: string;
 }
 
 export interface TagTable {
-    id: Generated<string>
+    id: Generated<number>
     name: string
     image: string
 }

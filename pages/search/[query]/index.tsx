@@ -1,7 +1,7 @@
 import {recipeRepository} from "@/src/repositories/recipeRepository";
 import {GetServerSideProps, InferGetServerSidePropsType} from "next";
 import {RecipePreview} from "@/src/model/Recipe";
-import {RecipeCard} from "@/src/components/recipe";
+import {RecipeCardLarge} from "@/src/components/recipe";
 
 export const getServerSideProps = (async (context) => {
     const query = context.params?.query as string | undefined;
@@ -18,7 +18,7 @@ export default function Page({recipes}: InferGetServerSidePropsType<typeof getSe
             <h1>Search results</h1>
             <div>
                 {recipes.map((recipe) => (
-                    <RecipeCard recipe={recipe} key={recipe.id}/>
+                    <RecipeCardLarge recipe={recipe} key={recipe.id}/>
                 ))}
             </div>
         </main>

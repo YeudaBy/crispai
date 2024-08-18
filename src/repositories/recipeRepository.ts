@@ -5,6 +5,7 @@ import {userRepository} from "@/src/repositories/userRepository";
 import {Ingredient} from "@/src/model/Ingredient";
 import {commentRepository} from "@/src/repositories/commentRepository";
 import {kv} from "@vercel/kv";
+import {Tag} from "../model/Tag";
 
 export interface IRecipeRepository {
     getRecipe(id: number): Promise<Recipe | undefined>;
@@ -43,6 +44,8 @@ export interface IRecipeRepository {
     getLikedRecipes(userId: number): Promise<RecipePreview[]>;
 
     getUsersWhoLiked(id: number): Promise<Author[]>;
+
+    getTags(): Promise<Tag[]>;
 }
 
 class RecipeRepository implements IRecipeRepository {
@@ -355,6 +358,19 @@ class RecipeRepository implements IRecipeRepository {
             .select(['id', 'name', 'amount', 'unit', "required"])
             .where('recipe_id', '=', id)
             .execute();
+    }
+
+    async getTags(): Promise<Tag[]> {
+        const cd = await kv.get<Tag[]>('tags');
+        if (cd) return cd
+
+        const tags = await db
+            .selectFrom('tag')
+            .select(['id', 'name', 'image'])
+            .execute();
+
+        await kv.set('tags', tags, {ex: 60 * 60 * 24})
+        return tags
     }
 }
 

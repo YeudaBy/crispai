@@ -1,14 +1,13 @@
 import React from "react";
-import {Inter} from "next/font/google";
-import Link from "next/link";
-import {Icon} from "@/src/components/recipe";
-import {vibrate} from "@/src/other/utils";
+import {NextFont} from "next/dist/compiled/@next/font";
 
-const inter = Inter({subsets: ["latin"]});
 
-export function Layout({children}: { children: React.ReactNode }) {
+export function Layout({children, font}: {
+    children: React.ReactNode,
+    font: NextFont;
+}) {
     return (
-        <main className={`min-h-screen flex flex-col justify-between ${inter.className}`}>
+        <main className={`min-h-screen flex flex-col justify-between ${font.className}`}>
             <section className={'grow'}>
                 {children}
             </section>
@@ -21,40 +20,26 @@ export function Layout({children}: { children: React.ReactNode }) {
 export function BottomNavBar() {
     return (
         <div
-            className={`sticky bottom-2 align-bottom h-fit rounded-full m-3 max-w-4xl shadow-sm mb-4 bg-wood-200 flex justify-around items-center`}>
-            <Link href={"/author/me"}>
-                <div
-                    role={"button"}
-                    onClick={() => vibrate()}
-                    className={`text-wood-400 shadow-test flex rounded-full border-wood-100 font-bold
-                     px-6 border-2 items-center justify-center text-sm gap-2 p-2 m-2 bg-white`}>
-                    Me
-                    <Icon/>
-                </div>
-            </Link>
+            className={`sticky bottom-4 align-bottom h-fit rounded-full m-3 max-w-4xl gap-16 text-neutral-500
+            shadow-lg shadow-neutral-500 mb-4 flex justify-between items-center bg-neutral-200 p-2`}>
 
-            <Link href={"/explore"}>
-                <div
-                    role={"button"}
-                    onClick={() => vibrate()}
-                    className={`text-wood-400 shadow-test flex rounded-full border-wood-100 font-bold
-                     px-6 border-2 items-center justify-center text-sm gap-2 p-2 m-2 bg-white`}>
-                    Explore
-                    <Icon/>
-                </div>
-            </Link>
+            <div
+                className={'flex p-1 shadow-sm text-sm tracking-wide font-light shadow-neutral-500 bg-white rounded-full w-full flex-col items-center'}>
+                profile
+            </div>
 
-            <Link href={"/"}>
+            <div
+                className={"absolute right-0 left-0 mx-auto -top-2/4 bg-neutral-200 rounded-full h-14 w-14 flex justify-center items-center"}>
                 <div
-                    role={"button"}
-                    onClick={() => vibrate()}
-                    className={`text-wood-400 shadow-test flex rounded-full border-wood-100 font-bold
-                    px-6 border-2 items-center justify-center text-sm gap-2 p-2 m-2 bg-white`}>
-                    Home
-                    <Icon/>
+                    className={"bg-white shadow-sm shadow-neutral-500 rounded-full h-10 w-10 flex justify-center items-center"}>
+                    +
                 </div>
-            </Link>
+            </div>
 
+            <div
+                className={'flex p-1 bg-white shadow-sm text-sm tracking-wide font-light shadow-neutral-500 rounded-full w-full flex-col items-center'}>
+                profile
+            </div>
         </div>
     )
 }

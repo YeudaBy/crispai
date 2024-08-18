@@ -7,7 +7,7 @@ import {auth} from "@/pages/api/auth/[...nextauth]";
 import React from "react";
 import {Dialog} from "@/src/components/dialog";
 import {UploadButton} from "@/src/components/uploadthing";
-import {Icon, RecipeCard} from "@/src/components/recipe";
+import {Icon, RecipeCardLarge} from "@/src/components/recipe";
 import {useRouter} from "next/router";
 import Link from "next/link";
 
@@ -107,7 +107,7 @@ export default function Page({recipes, user}: InferGetServerSidePropsType<typeof
                 </Link>
                 {recipes.map((recipe) => (
                     <div key={recipe.id}>
-                        <RecipeCard recipe={recipe}/>
+                        <RecipeCardLarge recipe={recipe}/>
                     </div>
                 ))}
             </div>
