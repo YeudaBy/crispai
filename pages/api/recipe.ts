@@ -27,4 +27,5 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const newId = await recipeRepository.createRecipe(title, description, userId, image);
         res.redirect(303, `/recipe/${newId}`);
     }
+
 }
