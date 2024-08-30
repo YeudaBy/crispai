@@ -4,13 +4,13 @@ import {RecipeCardLarge} from "@/src/components/recipe";
 import {useRouter} from "next/router";
 import {recipeRepository} from "@/src/repositories/recipeRepository";
 import Image from "next/image";
-import {Tag} from "@/src/model/Tag";
+import {Category} from "@/src/model/Category";
 import Link from "next/link";
 
 
 export default function Home(props: {
     byLikes: RecipePreview[],
-    tags: Tag[]
+    categories: Category[]
 }) {
     const [query, setQuery] = React.useState<string>('')
     const router = useRouter()
@@ -33,8 +33,8 @@ export default function Home(props: {
             </form>
 
             <div className={"flex gap-2 flex-wrap p-2"}>
-                {props.tags?.map((tag) => (
-                    <Link key={tag.id} href={`/tag/${tag.id}`} className={"w-fit"}>
+                {props.categories?.map((tag) => (
+                    <Link key={tag.id} href={`/category/${tag.id}`} className={"w-fit"}>
                         <div
                             className={"flex gap-1 justify-center items-center bg-blue-mint-dark text-blue-mint-lighter rounded-full w-fit px-2"}>
                             <Image
@@ -59,14 +59,14 @@ export default function Home(props: {
 
 export async function getServerSideProps() {
     const byLikes = await recipeRepository.getRecipesByLikes()
-    const tags = await recipeRepository.getTags()
+    const categories = await recipeRepository.getCategories()
 
     console.log(byLikes)
 
     return {
         props: {
-            // byLikes,
-            tags
+            byLikes,
+            categories
         }
     }
 }

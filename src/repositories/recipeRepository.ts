@@ -5,6 +5,7 @@ import {Ingredient} from "@/src/model/Ingredient";
 import {commentRepository} from "@/src/repositories/commentRepository";
 import {kv} from "@vercel/kv";
 import {Tag} from "../model/Tag";
+import {Category} from "../model/Category";
 import {AccountPreview} from "@/src/model/Account";
 
 export interface IRecipeRepository {
@@ -46,6 +47,8 @@ export interface IRecipeRepository {
     getUsersWhoLiked(id: number): Promise<AccountPreview[]>;
 
     getTags(): Promise<Tag[]>;
+
+    getCategories(): Promise<Category[]>;
 }
 
 class RecipeRepository implements IRecipeRepository {
@@ -55,7 +58,7 @@ class RecipeRepository implements IRecipeRepository {
 
         const recipe = await db
             .selectFrom('recipe')
-            .leftJoin('recipe_like', 'recipe.id', 'recipe_like.recipe_id')
+            .leftJoin('recipe_like', 'recipe.id', 'recipe_like.recipe')
             .innerJoin('account', 'recipe.account', 'account.id')
             .select(({fn}) => [
                 // recipe
@@ -71,7 +74,7 @@ class RecipeRepository implements IRecipeRepository {
                 'account.name',
                 'account.image as user_image',
 
-                fn.count('recipe_like.user_id').as('likes_count')
+                fn.count('recipe_like.account').as('likes_count')
             ])
             .where('recipe.id', '=', id)
             .groupBy(['recipe.id', 'account.id'])
@@ -116,7 +119,7 @@ class RecipeRepository implements IRecipeRepository {
 
         const recipe = await db
             .selectFrom('recipe')
-            .leftJoin('recipe_like', 'recipe.id', 'recipe_like.recipe_id')
+            .leftJoin('recipe_like', 'recipe.id', 'recipe_like.recipe')
             .innerJoin('account', 'recipe.account', 'account.id')
             .select(({fn}) => [
                 // recipe
@@ -132,7 +135,7 @@ class RecipeRepository implements IRecipeRepository {
                 'account.name as user_name',
                 'account.image as user_image',
 
-                fn.count('recipe_like.user_id').as('likes_count')
+                fn.count('recipe_like.account').as('likes_count')
             ])
             .groupBy(['recipe.id', 'account.id'])
             .where('recipe.id', '=', id)
@@ -166,10 +169,10 @@ class RecipeRepository implements IRecipeRepository {
 
         const ids = await db
             .selectFrom('recipe')
-            .leftJoin('recipe_like', 'recipe.id', 'recipe_like.recipe_id')
+            .leftJoin('recipe_like', 'recipe.id', 'recipe_like.recipe')
             .select(({fn, val}) => [
                 'id',
-                fn.count('recipe_like.user_id').as('likes_count')
+                fn.count('recipe_like.account').as('likes_count')
             ])
             .groupBy('recipe.id')
             .orderBy('likes_count', 'desc')
@@ -307,8 +310,8 @@ class RecipeRepository implements IRecipeRepository {
         await db
             .insertInto('recipe_like')
             .values({
-                recipe_id: id,
-                user_id: userId,
+                recipe: id,
+                account: userId,
             })
             .execute();
         await kv.del(`recipe_${id}`)
@@ -317,20 +320,20 @@ class RecipeRepository implements IRecipeRepository {
     unlikeRecipe(id: number, userId: number) {
         db
             .deleteFrom('recipe_like')
-            .where('recipe_id', '=', id)
-            .where('user_id', '=', userId)
+            .where('recipe', '=', id)
+            .where('account', '=', userId)
             .execute();
     }
 
     async getLikedRecipes(userId: number): Promise<Recipe[]> {
         const ids = await db
             .selectFrom('recipe_like')
-            .select(['recipe_id'])
-            .where('user_id', '=', userId)
+            .select(['recipe'])
+            .where('account', '=', userId)
             .execute();
 
         const recipes = await Promise.all(ids.map(async (recipe) => {
-            return this.getRecipe(recipe.recipe_id);
+            return this.getRecipe(recipe.recipe);
         }));
 
         return recipes.filter((recipe): recipe is Recipe => recipe !== undefined)
@@ -339,12 +342,12 @@ class RecipeRepository implements IRecipeRepository {
     async getUsersWhoLiked(id: number): Promise<AccountPreview[]> {
         const ids = await db
             .selectFrom('recipe_like')
-            .select(['user_id'])
-            .where('recipe_id', '=', id)
+            .select(['account'])
+            .where('recipe', '=', id)
             .execute();
 
         const users = await Promise.all(ids.map(async (user) => {
-            return userRepository.getAccountPreview(user.user_id);
+            return userRepository.getAccountPreview(user.account);
         }));
 
         return users.filter((user): user is AccountPreview => user !== undefined)
@@ -369,6 +372,19 @@ class RecipeRepository implements IRecipeRepository {
 
         await kv.set('tags', tags, {ex: 60 * 60 * 24})
         return tags
+    }
+
+    async getCategories(): Promise<Category[]> {
+        const cd = await kv.get<Category[]>('categories');
+        if (cd) return cd
+
+        const categories = await db
+            .selectFrom('category')
+            .select(['id', 'name', 'image'])
+            .execute();
+
+        await kv.set('categories', categories, {ex: 60 * 60 * 24})
+        return categories
     }
 }
 
