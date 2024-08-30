@@ -1,4 +1,4 @@
-import {db} from "../other/db";
+import {db} from "../other/db/db";
 import {RecipeComment} from "../model/RecipeComment";
 
 export interface ICommentRepository {
@@ -34,24 +34,23 @@ class CommentRepository implements ICommentRepository {
     ): Promise<RecipeComment[]> {
         const result = await db
             .selectFrom('comment')
-            .where('recipe_id', "=", recipeId)
-            .innerJoin('account', 'comment.author_id', 'account.id')
+            .where('recipe', "=", recipeId)
+            .innerJoin('account', 'comment.account', 'account.id')
             .select([
                 // comment
                 'comment.id',
                 'content',
                 'date',
-                'author_id',
+                'account',
                 'likes',
                 'author_reply',
                 'author_like',
                 'pined',
 
                 // account
-                'account.id',
-                'account.name',
-                'account.image',
-                'account.verified'
+                'account.id as account_id',
+                'account.name as account_name',
+                'account.image as account_image',
             ])
             .orderBy(orderBy, 'desc')
             .limit(limit)
@@ -62,11 +61,10 @@ class CommentRepository implements ICommentRepository {
             id: comment.id,
             content: comment.content,
             date: comment.date.getDate(),
-            user: {
-                id: comment.author_id,
-                name: comment.name,
-                image: comment.image,
-                verified: comment.verified,
+            account: {
+                id: comment.account_id,
+                name: comment.account_name,
+                image: comment.account_image,
             },
             likes: comment.likes,
             author_reply: comment.author_reply,
@@ -82,8 +80,8 @@ class CommentRepository implements ICommentRepository {
     ): void {
         db.insertInto('comment')
             .values({
-                recipe_id: recipeId,
-                author_id: userId,
+                recipe: recipeId,
+                account: userId,
                 content,
             })
             .execute();
@@ -97,14 +95,18 @@ class CommentRepository implements ICommentRepository {
 
     pinComment(id: number): void {
         db.updateTable('comment')
-            .set('pined', true)
+            .set({
+                pined: true,
+            })
             .where('id', '=', id)
             .execute();
     }
 
     likeAsAuthor(id: number, content: string): void {
         db.updateTable('comment')
-            .set('author_reply', content)
+            .set({
+                author_reply: content,
+            })
             .where('id', '=', id)
             .execute();
     }

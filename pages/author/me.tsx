@@ -1,7 +1,6 @@
 import {recipeRepository} from "@/src/repositories/recipeRepository";
 import {GetServerSideProps, InferGetServerSidePropsType} from "next";
 import {RecipePreview} from "@/src/model/Recipe";
-import {userRepository} from "@/src/repositories/userRepository";
 import {Author} from "@/src/model/Author";
 import {auth} from "@/pages/api/auth/[...nextauth]";
 import React from "react";
@@ -10,30 +9,29 @@ import {UploadButton} from "@/src/components/uploadthing";
 import {Icon, RecipeCardLarge} from "@/src/components/recipe";
 import {useRouter} from "next/router";
 import Link from "next/link";
+import {GoToLogin} from "@/src/components/auth";
+import {authorRepository} from "@/src/repositories/authorRepository";
 
 export const getServerSideProps = (async (context) => {
     const session = await auth(context.req, context.res);
     const myId = Number(session?.user.id);
     const recipes = Number.isNaN(myId) ? [] : await recipeRepository.getRecipesByUser(myId);
-    const user = Number.isNaN(myId) ? undefined : await userRepository.getUser(myId);
-    return {props: {recipes, user: user || null}}
+    const author = Number.isNaN(myId) ? undefined : await authorRepository.getAuthor(myId);
+    return {props: {recipes, author: author || null}}
 }) satisfies GetServerSideProps<{
     recipes: RecipePreview[],
-    user: Author | null
+    author: Author | null
 }>
 
 
-export default function Page({recipes, user}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+export default function Page({recipes, author}: InferGetServerSidePropsType<typeof getServerSideProps>) {
     const router = useRouter();
     const [profileDialogOpen, setProfileDialogOpen] = React.useState(false);
     const [newName, setNewName] = React.useState("");
 
     console.log(recipes)
-    if (!user) {
-        return <button onClick={() => router.push("/api/auth/signin")}
-                       className={"border-2 border-pastelBlue-400 px-4 rounded-full text-sm py-1"}>
-            Login
-        </button>
+    if (!author) {
+        return <GoToLogin/>
     }
     return (
         <>
@@ -42,10 +40,10 @@ export default function Page({recipes, user}: InferGetServerSidePropsType<typeof
                     onClick={() => setProfileDialogOpen(true)}
                     className={"rounded-full h-20 w-20 overflow-hidden border-4 border-pastelBlue-400"}>
                     {
-                        user.image ?
-                            <img src={user.image} alt={user.name}/> :
+                        author.account.image ?
+                            <img src={author.account.image} alt={author.account.name}/> :
                             <div className={"flex justify-center items-center h-full"}>
-                                <span className={"text-3xl"}>{user.name[0]}</span>
+                                <span className={"text-3xl"}>{author.account.name[0]}</span>
                             </div>
                     }
                 </div>
@@ -65,10 +63,10 @@ export default function Page({recipes, user}: InferGetServerSidePropsType<typeof
                                     })
                                 }}
                             />
-                            : <h1 className={"font-bold"} onClick={() => setNewName(user.name)}>{user.name}</h1>
+                            : <h1 className={"font-bold"}
+                                  onClick={() => setNewName(author.account.name)}>{author.account.name}</h1>
                     }
-                    <p className={"text-sm font-light"}>{user.email}</p>
-                    {user.bio && <p dangerouslySetInnerHTML={{__html: user.bio}}></p>}
+                    {author.bio && <p dangerouslySetInnerHTML={{__html: author.bio}}></p>}
                 </div>
 
                 <div className={"flex flex-col gap-2 items-center"}>
@@ -80,7 +78,7 @@ export default function Page({recipes, user}: InferGetServerSidePropsType<typeof
             <div className={"flex flex-row gap-2 p-2 items-center"}>
                 <div className={"flex flex-col gap-2"}>
                     <h1 className={"font-bold"}>Bio</h1>
-                    <p>{user.bio}</p>
+                    <p>{author.bio}</p>
                 </div>
             </div>
 

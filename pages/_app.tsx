@@ -4,20 +4,30 @@ import type {AppProps} from "next/app";
 import {SessionProvider} from "next-auth/react";
 import {Layout} from "@/src/components/layout";
 import {Inter} from "next/font/google";
+import {ReactElement, ReactNode} from "react";
+import {NextPage} from "next";
 
-const inter = Inter({
-    weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
-    subsets: ["latin-ext"],
-});
+
+export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
+    getLayout?: (page: ReactElement) => ReactNode
+}
+
+type AppPropsWithLayout = AppProps & {
+    Component: NextPageWithLayout
+}
 
 export default function App({
                                 Component,
                                 pageProps: {session, ...pageProps},
-                            }: AppProps) {
+                            }: AppPropsWithLayout) {
     const isHome = Component.name === "Home";
     return <SessionProvider session={session}>
-        <Layout font={inter} isHome={isHome}>
-            <Component {...pageProps} />
-        </Layout>
+        {
+            Component.getLayout ? Component.getLayout(<Component {...pageProps} />) :
+                <Layout isHome={isHome}>
+                    <Component {...pageProps} />
+                </Layout>
+
+        }
     </SessionProvider>
 }

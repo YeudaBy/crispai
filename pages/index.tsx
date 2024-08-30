@@ -24,10 +24,11 @@ export default function Home(props: {
                 }
             }}>
                 <input type="text" placeholder={'Search'} value={query} onChange={(e) => setQuery(e.target.value)}
-                       className={"rounded-full bg-neutral-200 border-2 w-full text-sm p-2"}/>
+                       className={"rounded-full bg-blue-mint-lighter text-blue-mint-text border-2 w-full text-sm p-2"}/>
 
-                <button type="submit" className={"bg-neutral-200 border-2 text-white rounded-full p-2"}>
-                    <Image src={"/pan-icon.svg"} width={30} height={30} alt={"Search Icon"}/>
+                <button type="submit" className={"bg-blue-mint-lighter text-blue-mint-text border-2 rounded-full p-2"}>
+                    <Image src={"/pan-icon.svg"} width={30} height={30} alt={"Search Icon"}
+                           className={"filter-blue-mint-text"}/>
                 </button>
             </form>
 
@@ -35,10 +36,12 @@ export default function Home(props: {
                 {props.tags?.map((tag) => (
                     <Link key={tag.id} href={`/tag/${tag.id}`} className={"w-fit"}>
                         <div
-                            className={"flex gap-1 justify-center items-center bg-neutral-300 rounded-full w-fit px-2"}>
-                            <Image src={tag.image
-                                ? tag.image
-                                : "/default-tag.svg"} width={32} height={32} alt={tag.name}/>
+                            className={"flex gap-1 justify-center items-center bg-blue-mint-dark text-blue-mint-lighter rounded-full w-fit px-2"}>
+                            <Image
+                                className={"filter-brown-lighter"}
+                                src={tag.image
+                                    ? tag.image
+                                    : "/default-tag.svg"} width={32} height={32} alt={tag.name}/>
                             {tag.name}
                         </div>
                     </Link>)
@@ -58,9 +61,12 @@ export async function getServerSideProps() {
     const byLikes = await recipeRepository.getRecipesByLikes()
     const tags = await recipeRepository.getTags()
 
+    console.log(byLikes)
+
     return {
         props: {
-            byLikes, tags
+            // byLikes,
+            tags
         }
     }
 }

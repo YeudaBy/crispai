@@ -1,14 +1,46 @@
-$base-blue: #6CCFF6;
-$base-pink: #F2D5F8;
-$base-accent: #EFEFD0;
-$base-dark: #001011;
-$base-grey: #757780;
+/* Image filters - brown */
+.filter-brown-lighter {
+  filter: invert(82%) sepia(38%) saturate(122%) hue-rotate(342deg) brightness(108%) contrast(91%);
+}
+
+.filter-brown-light {
+  filter: invert(84%) sepia(24%) saturate(317%) hue-rotate(339deg) brightness(96%) contrast(87%);
+}
+
+.filter-brown {
+  filter: invert(72%) sepia(10%) saturate(1902%) hue-rotate(331deg) brightness(106%) contrast(92%);
+}
+
+.filter-brown-dark {
+  filter: invert(49%) sepia(88%) saturate(222%) hue-rotate(337deg) brightness(97%) contrast(88%);
+}
+
+.filter-brown-text {
+  filter: invert(17%) sepia(19%) saturate(888%) hue-rotate(338deg) brightness(96%) contrast(98%);
+}
 
 
-//body, html, main {
-//  background: linear-gradient(
-//                  to bottom,
-//                  transperent,
-//                  $base-accent,
-//  );
-//}
+/* Image filters - blue-mint */
+.filter-blue-mint-lighter {
+  filter: invert(95%) sepia(5%) saturate(160%) hue-rotate(93deg) brightness(98%) contrast(88%);
+}
+
+.filter-blue-mint-light {
+  filter: invert(88%) sepia(24%) saturate(198%) hue-rotate(106deg) brightness(96%) contrast(86%);
+}
+
+.filter-blue-mint {
+  filter: invert(76%) sepia(14%) saturate(497%) hue-rotate(116deg) brightness(90%) contrast(91%);
+}
+
+.filter-blue-mint-dark {
+  filter: invert(67%) sepia(10%) saturate(520%) hue-rotate(91deg) brightness(85%) contrast(90%);
+}
+
+.filter-blue-mint-text {
+  filter: invert(15%) sepia(4%) saturate(1650%) hue-rotate(90deg) brightness(98%) contrast(92%);
+}
+
+.filter-brown-dark:hover {
+  filter: invert(72%) sepia(10%) saturate(1902%) hue-rotate(331deg) brightness(106%) contrast(92%);
+}

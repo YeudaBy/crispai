@@ -1,5 +1,5 @@
 import {RecipeTable} from "@/src/model/Recipe";
-import {AccountTable} from "@/src/model/Author";
+import {AuthorTable} from "@/src/model/Author";
 import {IngredientTable} from "@/src/model/Ingredient";
 import {StepTable} from "@/src/model/Step";
 import {CategoryTable} from "@/src/model/Category";
@@ -8,10 +8,12 @@ import {TagTable} from "@/src/model/Tag";
 import {CommentTable} from "@/src/model/RecipeComment";
 import {Kysely, PostgresDialect} from "kysely";
 import {Pool} from "pg";
+import {AccountTable} from "@/src/model/Account";
 
 export interface Database {
     recipe: RecipeTable,
     account: AccountTable,
+    author: AuthorTable,
     ingredient: IngredientTable,
     step: StepTable,
     category: CategoryTable,
@@ -25,7 +27,7 @@ export interface Database {
     },
 }
 
-const dialect = new PostgresDialect({
+export const dialect = new PostgresDialect({
     pool: new Pool({
         host: process.env.POSTGRES_HOST,
         password: process.env.POSTGRES_PASSWORD,
@@ -33,10 +35,9 @@ const dialect = new PostgresDialect({
         user: process.env.POSTGRES_USER,
         ssl: true
     })
-
 })
 
 export const db = new Kysely<Database>({
-    dialect,
+    dialect
 })
 

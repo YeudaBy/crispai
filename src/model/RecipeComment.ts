@@ -1,11 +1,12 @@
 import {Generated} from "kysely";
-import {AuthorPreview} from "@/src/model/Author";
+import {AccountPreview} from "@/src/model/Account";
 
 export type RecipeComment = {
     id: number;
     content: string;
+    /* number for serialization */
     date: number;
-    user: AuthorPreview,
+    account: AccountPreview,
     likes: number;
     author_reply?: string;
     author_like: boolean;
@@ -16,8 +17,8 @@ export interface CommentTable {
     id: Generated<number>
     content: string
     date: Generated<Date>
-    author_id: number
-    recipe_id: number
+    account: number
+    recipe: number
     likes: Generated<number>
     author_reply?: string
     author_like: Generated<boolean>

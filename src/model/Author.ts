@@ -1,27 +1,14 @@
 import {Generated} from "kysely";
+import {AccountPreview} from "@/src/model/Account";
 
 export type Author = {
-    id: number;
-    email: string;
-    name: string;
-    image?: string;
+    account: AccountPreview;
     bio?: string;
     verified: boolean;
 }
 
-export type AuthorPreview = {
-    id: number;
-    name: string;
-    image?: string;
+export type AuthorTable = {
+    account: Generated<number>;
+    bio?: string;
     verified: boolean;
-}
-
-export interface AccountTable {
-    id: Generated<number>
-    password?: string
-    name: string
-    email: string
-    image?: string
-    bio?: string
-    verified: boolean
 }

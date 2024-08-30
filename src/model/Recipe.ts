@@ -4,8 +4,9 @@ import {Ingredient} from "@/src/model/Ingredient";
 import {Category} from "@/src/model/Category";
 import {Equipment} from "@/src/model/Equipment";
 import {RecipeComment} from "@/src/model/RecipeComment";
-import {AuthorPreview} from "./Author";
 import {Generated} from "kysely";
+import {Author} from "@/src/model/Author";
+import {AccountPreview} from "@/src/model/Account";
 
 export type Recipe = {
     id: number;
@@ -14,7 +15,7 @@ export type Recipe = {
     likes: number;
     /* is number for serialization */
     date: number;
-    author: AuthorPreview;
+    account: AccountPreview;
     image?: string;
     comments: RecipeComment[];
     ingredients: Ingredient[];
@@ -33,7 +34,7 @@ export type RecipePreview = {
     /* is number for serialization */
     date: number;
     likes: number;
-    author: AuthorPreview;
+    account: AccountPreview;
 }
 
 export interface RecipeTable {
@@ -42,6 +43,6 @@ export interface RecipeTable {
     description?: string
     image?: string;
     date: Date
-    author: number
+    account: number
     avgEstimate?: number
 }

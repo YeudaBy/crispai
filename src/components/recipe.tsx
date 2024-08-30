@@ -5,7 +5,7 @@ import React from "react";
 export function RecipeCardLarge({recipe}: { recipe: RecipePreview }) {
     return (
         <div
-            className="shadow-lg rounded-tr-bl-6xl overflow-hidden w-full bg-neutral-200/50">
+            className="shadow-lg rounded-tr-bl-6xl overflow-hidden w-full bg-blue-mint-lighter/50">
             <img src={recipe.image || "https://placehold.co/600x400"} alt={recipe.title}
                  className="w-full rounded-b-6xl h-56 object-cover hover:scale-x-105 transform transition-all duration-300"/>
 
@@ -13,14 +13,14 @@ export function RecipeCardLarge({recipe}: { recipe: RecipePreview }) {
                 <Link href={`/recipe/${recipe.id}`}>
                     <h2 className="text-base tracking-wider font-bold hover:underline">{recipe.title}</h2>
                 </Link>
-                <p className="text-sm font-extralight opacity-65 text-ellipsis line-clamp-2">{recipe.description}</p>
+                <p className="text-sm font-extralight text-blue-mint-text opacity-65 text-ellipsis line-clamp-2">{recipe.description}</p>
                 <hr className={"my-2"}/>
                 <div className="flex justify-between items-center mt-2">
-                    <p className={"font-light text-sm"}>{recipe.likes} likes • Easy</p>
-                    <Link href={"/author/" + recipe.author.id}>
-                        <div className="flex gap-2 items-center">
-                            <p className={'text-sm font-light'}>{recipe.author.name}</p>
-                            <img src={recipe.author.image} alt={recipe.author.name} className="w-6 h-6 rounded-full"/>
+                    <p className={"font-light text-sm text-blue-mint-text/85"}>{recipe.likes} likes • Easy</p>
+                    <Link href={"/author/" + recipe.account.id}>
+                        <div className="flex gap-2 items-center bg-blue-mint-lighter p-1 rounded-full px-3">
+                            <p className={'text-sm font-light text-blue-mint-text'}>{recipe.account.name}</p>
+                            <img src={recipe.account.image} alt={recipe.account.name} className="w-6 h-6 rounded-full"/>
                         </div>
                     </Link>
                 </div>
