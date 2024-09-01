@@ -17,20 +17,46 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     console.log(session.user);
 
-    if (req.method === "POST") {
-        const {title, description, image, id} = JSON.parse(req.body);
-        if (!id) {
-            res.status(400).json({error: "No recipe id provided"});
-            return;
-        }
-        if (!!title) await recipeRepository.updateTitle(id, title);
-        if (!!description) await recipeRepository.updateDescription(id, description);
-        if (!!image) await recipeRepository.updateImage(id, image);
-        res.status(200).json({message: "Recipe updated"});
-    } else {
-        const {title, description, image} = req.body || req.query;
-        const newId = await recipeRepository.createRecipe(title, description, userId, image);
-        res.redirect(303, `/recipe/${newId}`);
+    const {title, description, id, images} = JSON.parse(req.body);
+
+    switch (req.method) {
+        case "PUT":
+            const newId = await recipeRepository.createRecipe(title, description, userId, images[0]);
+            res.status(200).json({message: "Recipe created", id: newId});
+            break;
+        case "POST":
+            if (!id) {
+                res.status(400).json({error: "No recipe id provided"});
+                return;
+            }
+            if (!!title) await recipeRepository.updateTitle(id, title);
+            if (!!description) await recipeRepository.updateDescription(id, description);
+            if (!!images.length) {
+                for (const image of images) {
+                    await recipeRepository.updateImage(id, image);
+                }
+            }
+            res.status(200).json({message: "Recipe updated"});
+            break
+        case "DELETE":
+            if (!id) {
+                res.status(400).json({error: "No recipe id provided"});
+                return;
+            }
+            recipeRepository.deleteRecipe(id);
+            res.status(200).json({message: "Recipe deleted"});
+            break
+        case "GET":
+            if (!id) {
+                res.status(400).json({error: "No recipe id provided"});
+                return;
+            }
+            const recipe = await recipeRepository.getRecipe(id);
+            res.status(200).json(recipe);
+            break;
+        default:
+            res.status(405).json({error: "Method not allowed"});
+            break;
     }
 
 }

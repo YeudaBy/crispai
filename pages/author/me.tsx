@@ -42,7 +42,7 @@ export default function Page({recipes}: InferGetServerSidePropsType<typeof getSe
                         data?.user.image ?
                             <img src={data?.user.image} alt={data?.user.name || ""}/> :
                             <div className={"flex justify-center items-center h-full"}>
-                                <span className={"text-3xl"}>{data?.user.name[0]}</span>
+                                <span className={"text-3xl"}>{data?.user.name}</span>
                             </div>
                     }
                 </div>
@@ -63,7 +63,7 @@ export default function Page({recipes}: InferGetServerSidePropsType<typeof getSe
                                 }}
                             />
                             : <h1 className={"font-bold"}
-                                  onClick={() => setNewName(data?.user.name)}>{data?.user.name}</h1>
+                                  onClick={() => setNewName(data?.user.name || "")}>{data?.user.name}</h1>
                     }
                     {/*{author.bio && <p dangerouslySetInnerHTML={{__html: author.bio}}></p>}*/}
                 </div>

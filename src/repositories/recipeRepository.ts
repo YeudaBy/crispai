@@ -2,10 +2,10 @@ import {Recipe, RecipePreview} from "@/src/model/Recipe";
 import {db} from "../other/db/db";
 import {userRepository} from "@/src/repositories/accountRepository";
 import {Ingredient} from "@/src/model/Ingredient";
-import {commentRepository} from "@/src/repositories/commentRepository";
 import {kv} from "@vercel/kv";
 import {Tag} from "../model/Tag";
 import {Category} from "../model/Category";
+import {RecipeComment} from "../model/RecipeComment";
 import {AccountPreview} from "@/src/model/Account";
 
 export interface IRecipeRepository {
@@ -85,8 +85,8 @@ class RecipeRepository implements IRecipeRepository {
             return undefined
         }
 
-        const ingredients = [] // await this.getRecipeIngredients(id);
-        const comments = [] //await commentRepository.getCommentsByRecipe(id);
+        const ingredients: Ingredient[] = [] // await this.getRecipeIngredients(id);
+        const comments: RecipeComment[] = [] //await commentRepository.getCommentsByRecipe(id);
 
         const data: Recipe = {
             id: recipe.recipe_id,
@@ -266,6 +266,8 @@ class RecipeRepository implements IRecipeRepository {
         if (!newRecipe) {
             throw new Error('Recipe not created')
         }
+
+        await kv.del(`recipes_by_user_${userId}`)
 
         return newRecipe.id;
     }
