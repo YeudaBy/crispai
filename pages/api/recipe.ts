@@ -19,6 +19,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const {title, description, id, images} = JSON.parse(req.body);
 
+    console.log(req.method)
+
     switch (req.method) {
         case "PUT":
             const newId = await recipeRepository.createRecipe(title, description, userId, images[0]);
