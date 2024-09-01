@@ -98,7 +98,7 @@ export default function Page({recipes}: InferGetServerSidePropsType<typeof getSe
 
             <div className={"flex flex-col gap-2 p-2"}>
                 <Link href={"/recipe/add"}>
-                    <div className={"rounded-full bg-pastelMint-900 text-pastelMint-200 p-4 w-full text-center"}>
+                    <div className={"rounded-full bg-blue-mint-lighter hover:bg-blue-mint-light text-blue-mint-text p-4 w-full text-center"}>
                         Add New Recipe
                     </div>
                 </Link>

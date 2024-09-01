@@ -44,6 +44,7 @@ export function Layout({children, isHome, bnb = <BottomNavBar/>}: {
                 }
                 {children}
             </section>
+            <div className={"h-16"}/>
             {bnb}
         </main>
     );
@@ -91,7 +92,7 @@ export function BottomNavBar() {
     }
 
     return (
-        <div className={"fixed w-screen bottom-0 align-bottom h-fit max-w-4xl"}>
+        <div className={"fixed w-screen bottom-0 align-bottom h-15 max-w-4xl"}>
             <div
                 className={"flex justify-between bg-gradient-to-r from-blue-mint-lighter to-blue-mint-light hover:bg-gradient-to-tr"}>
                 {items.map((item, index) => (

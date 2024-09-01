@@ -6,8 +6,10 @@ export function RecipeCardLarge({recipe}: { recipe: RecipePreview }) {
     return (
         <div
             className="hover:shadow-lg rounded-tr-3xl overflow-hidden w-full bg-blue-mint-lighter/50">
-            <img src={recipe.image || "https://placehold.co/600x400"} alt={recipe.title}
-                 className="w-full h-56 object-cover hover:scale-x-105 transform transition-all duration-300"/>
+            <Link href={`/recipe/${recipe.id}`}>
+                <img src={recipe.image || "https://placehold.co/600x400"} alt={recipe.title}
+                     className="w-full h-56 object-cover"/>
+            </Link>
 
             <div className={'p-4'}>
                 <Link href={`/recipe/${recipe.id}`}>
