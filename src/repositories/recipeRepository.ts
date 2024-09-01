@@ -232,6 +232,9 @@ class RecipeRepository implements IRecipeRepository {
     }
 
     async getRecipesBySearch(search: string): Promise<Recipe[]> {
+        const cd = await kv.get<Recipe[]>(`recipes_by_search_${search}`);
+        if (cd) return cd
+
         const ids = await db
             .selectFrom('recipe')
             .select(['id'])
@@ -242,7 +245,11 @@ class RecipeRepository implements IRecipeRepository {
             return this.getRecipePreview(recipe.id);
         }));
 
-        return recipes.filter((recipe): recipe is Recipe => recipe !== undefined)
+        const filtered = recipes.filter((recipe): recipe is Recipe => recipe !== undefined)
+
+        await kv.set(`recipes_by_search_${search}`, filtered, {ex: 60 * 60 * 24})
+
+        return filtered
     }
 
     async createRecipe(
@@ -268,6 +275,8 @@ class RecipeRepository implements IRecipeRepository {
         }
 
         await kv.del(`recipes_by_user_${userId}`)
+        await kv.del('recipes_by_likes')
+        await kv.del('recipes_by_date')
 
         return newRecipe.id;
     }
@@ -281,6 +290,7 @@ class RecipeRepository implements IRecipeRepository {
             .where('id', '=', id)
             .execute();
         await kv.del(`recipe_${id}`)
+        await kv.del(`recipe_preview_${id}`)
     }
 
     async updateDescription(id: string, description: string): Promise<void> {
@@ -289,6 +299,8 @@ class RecipeRepository implements IRecipeRepository {
             .set({description})
             .where('id', '=', id)
             .execute();
+        await kv.del(`recipe_${id}`)
+        await kv.del(`recipe_preview_${id}`)
     }
 
     async updateImage(id: string, image: string): Promise<void> {
@@ -298,6 +310,7 @@ class RecipeRepository implements IRecipeRepository {
             .where('id', '=', id)
             .execute();
         await kv.del(`recipe_${id}`)
+        await kv.del(`recipe_preview_${id}`)
     }
 
     async deleteRecipe(id: string) {
@@ -316,18 +329,22 @@ class RecipeRepository implements IRecipeRepository {
                 account: userId,
             })
             .execute();
-        await kv.del(`recipe_${id}`)
+        await kv.del(`liked_recipes_${userId}`)
     }
 
-    unlikeRecipe(id: string, userId: string) {
-        db
+    async unlikeRecipe(id: string, userId: string) {
+        await db
             .deleteFrom('recipe_like')
             .where('recipe', '=', id)
             .where('account', '=', userId)
             .execute();
+        await kv.del(`liked_recipes_${userId}`)
     }
 
     async getLikedRecipes(userId: string): Promise<Recipe[]> {
+        const cd = await kv.get<Recipe[]>(`liked_recipes_${userId}`);
+        if (cd) return cd
+
         const ids = await db
             .selectFrom('recipe_like')
             .select(['recipe'])
@@ -338,7 +355,10 @@ class RecipeRepository implements IRecipeRepository {
             return this.getRecipe(recipe.recipe);
         }));
 
-        return recipes.filter((recipe): recipe is Recipe => recipe !== undefined)
+        const filtered = recipes.filter((recipe): recipe is Recipe => recipe !== undefined)
+
+        await kv.set(`liked_recipes_${userId}`, filtered, {ex: 60 * 60 * 24})
+        return filtered
     }
 
     async getUsersWhoLiked(id: string): Promise<AccountPreview[]> {

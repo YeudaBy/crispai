@@ -15,7 +15,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const userId = session.user.id;
 
-    console.log(session.user);
+    console.log({
+        user: session.user,
+        body: req.body
+    });
 
     const {title, description, id, images} = JSON.parse(req.body);
 
@@ -57,6 +60,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             res.status(200).json(recipe);
             break;
         default:
+            console.error("Method not allowed", req.method);
             res.status(405).json({error: "Method not allowed"});
             break;
     }
