@@ -10,8 +10,8 @@ export const getServerSideProps = (async (context) => {
     if (!id) {
         return {notFound: true}
     }
-    const recipes = await recipeRepository.getRecipesByUser(Number(id));
-    const author = await authorRepository.getAuthor(Number(id));
+    const recipes = await recipeRepository.getRecipesByUser(id);
+    const author = await authorRepository.getAuthor(id);
     if (!author) {
         return {notFound: true}
     }
