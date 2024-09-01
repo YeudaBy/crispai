@@ -8,7 +8,7 @@ export type Author = {
 }
 
 export type AuthorTable = {
-    account: Generated<number>;
+    account: Generated<string>;
     bio?: string;
     verified: boolean;
 }

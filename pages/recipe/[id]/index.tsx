@@ -3,11 +3,11 @@ import {GetServerSideProps, InferGetServerSidePropsType} from "next";
 import {recipeRepository} from "@/src/repositories/recipeRepository";
 import {useSession} from "next-auth/react";
 import {UploadDropzone} from "@/src/components/uploadthing";
-import {Ingredient} from "@/src/model/Ingredient";
 import Image from "next/image";
 import {NextPageWithLayout} from "@/pages/_app";
 import {Layout} from "@/src/components/layout";
 import React from "react";
+import {Ingredient} from "@/src/model/Ingredient";
 
 
 export const getServerSideProps = (async (context) => {
@@ -15,7 +15,7 @@ export const getServerSideProps = (async (context) => {
     if (!id) {
         return {notFound: true}
     }
-    const recipe = await recipeRepository.getRecipe(Number(id));
+    const recipe = await recipeRepository.getRecipe(id)
     if (!recipe) {
         return {notFound: true}
     }
@@ -27,8 +27,8 @@ type PageType = InferGetServerSidePropsType<typeof getServerSideProps>
 const Page: NextPageWithLayout<PageType> = ({recipe}: PageType) => {
 
     const session = useSession()
-    // @ts-ignore  todo
-    const isOwner = session.data?.user?.id === recipe.author.id
+
+    const isOwner = session.data?.user?.id === recipe.account.id
 
     const [toolBoxOpen, setToolBoxOpen] = React.useState(false)
 
@@ -36,13 +36,13 @@ const Page: NextPageWithLayout<PageType> = ({recipe}: PageType) => {
         <>
             <div
                 style={{
-                    background: `url(${recipe.image})`,
+                    background: `url(${recipe.main_image})`,
                     backgroundSize: "cover",
                     backgroundPosition: "center",
                     backgroundRepeat: "no-repeat",
                 }}
                 className={"h-56 w-full p-4 fixed"}>
-                {(!recipe.image && isOwner) && <UploadDropzone
+                {(!recipe.main_image && isOwner) && <UploadDropzone
                     className={"bg-brown-lighter p-0 ut-button:text-sm ut-button:bg-brown-text ut-button:mb-2 ut-label:text-brown-text"}
                     endpoint={"imageUploader"}
                     onClientUploadComplete={(res) => {
@@ -62,17 +62,15 @@ const Page: NextPageWithLayout<PageType> = ({recipe}: PageType) => {
                 />}
             </div>
 
-            <div className={"bg-white rounded-tl-3xl rounded-tr-3xl w-full relative top-52 p-2"}>
-                <div className={""}>
+            <div className={"bg-white rounded-tl-3xl w-full relative top-52 h-full flex flex-col items-center"}>
+                <div className={"p-3 mb-4 w-full grow"}>
                     <h1 className={"text-3xl font-bold"}>{recipe.title}</h1>
                     <p>{recipe.description}</p>
                     <p className={'text-sm opacity-65'}>{recipe.likes} Likes • {recipe.date} • {recipe.account.name}</p>
-                    <hr className={"my-2"}/>
                 </div>
 
-                <div className={"rounded-tr-bl-3xl border-brown border-4 p-4"}>
-                    <div className={""}>
-                        <h2 className={"text-xl font-bold text-brown-dark"}>Ingredients</h2>
+                <div>
+                    <Section bgColor={"brown-lighter"} title={"Ingredients"} initialOpen>
                         <ul>
                             {demoIngredients().map((ingredient, index) => (
                                 <>
@@ -98,12 +96,9 @@ const Page: NextPageWithLayout<PageType> = ({recipe}: PageType) => {
                                 </>
                             ))}
                         </ul>
-                    </div>
-                </div>
+                    </Section>
 
-                <div className={"bg-brown-lighter/50 shadow-md shadow-brown/50 rounded-tl-br-3xl p-4 mt-2"}>
-                    <div className={""}>
-                        <h2 className={"text-xl font-bold"}>Instructions</h2>
+                    <Section bgColor={"brown-light"} title={"Instructions"}>
                         <p className={"whitespace-pre-line"}>
                             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam nec nunc nec nunc
                             consectetur
@@ -116,12 +111,9 @@ const Page: NextPageWithLayout<PageType> = ({recipe}: PageType) => {
                             <br/>
                             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam nec nunc nec nunc
                         </p>
-                    </div>
-                </div>
+                    </Section>
 
-                <div className={"bg-neutral-200 rounded-tr-bl-3xl p-4 mt-2"}>
-                    <div className={""}>
-                        <h2 className={"text-xl font-bold"}>Comments</h2>
+                    <Section bgColor={"blue-mint-lighter"} title={"Comments"}>
                         <p className={"whitespace-pre-line"}>
                             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam nec nunc nec nunc
                             consectetur
@@ -134,8 +126,9 @@ const Page: NextPageWithLayout<PageType> = ({recipe}: PageType) => {
                             <br/>
                             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam nec nunc nec nunc
                         </p>
-                    </div>
+                    </Section>
                 </div>
+
             </div>
 
             <div
@@ -148,6 +141,34 @@ const Page: NextPageWithLayout<PageType> = ({recipe}: PageType) => {
             <ToolBox isOpen={toolBoxOpen} onClose={() => setToolBoxOpen(false)} recipe={recipe}/>
         </>
     )
+}
+
+function Section({bgColor, title, children, initialOpen = false}: {
+    bgColor: string,
+    title: string,
+    children: React.ReactNode,
+    initialOpen?: boolean
+}) {
+    const [isOpen, setIsOpen] = React.useState(initialOpen)
+    return <div className={`bg-${bgColor} p-4 rounded-tl-3xl pb-8 -mt-4`}>
+        <h2
+            className={"text-xl font-bold flex items-center cursor-pointer justify-between"}
+            onClick={() => setIsOpen(!isOpen)}
+        >
+            {title}
+            <Image
+                src={isOpen ? "/expand_less_google.svg" : "/expand_more_google.svg"}
+                alt={isOpen ? "Close" : "Open"}
+                width={24} height={24}
+                className={"filter-brown-dark"}
+            />
+        </h2>
+        <hr/>
+        <div
+            className={`mt-2 ${isOpen ? "opacity-100 h-fit" : "opacity-0 pointer-events-none h-0"} transition-all duration-300`}>
+            {children}
+        </div>
+    </div>
 }
 
 function ToolBox({isOpen, onClose, recipe}: {
@@ -219,12 +240,64 @@ Page.getLayout = (page) => (
 
 export default Page;
 
+
 function demoIngredients(): Ingredient[] {
     return [
-        {id: 0, name: "flour", amount: "2", unit: "cups", required: true},
-        {id: 1, name: "sugar", amount: "1", unit: "cup", required: true},
-        {id: 2, name: "butter", amount: "1", unit: "stick", required: true},
-        {id: 3, name: "eggs", amount: "2", unit: "", required: false},
-        {id: 4, name: "milk", amount: "1", unit: "cup", required: true},
+        {
+            id: "1",
+            name: "Flour",
+            amount: "2",
+            unit: "cups",
+            required: true
+        },
+        {
+            id: "2",
+            name: "Sugar",
+            amount: "1",
+            unit: "cup",
+            required: true
+        },
+        {
+            id: "3",
+            name: "Eggs",
+            amount: "2",
+            unit: "units",
+            required: true
+        },
+        {
+            id: "4",
+            name: "Milk",
+            amount: "1",
+            unit: "cup",
+            required: true
+        },
+        {
+            id: "5",
+            name: "Butter",
+            amount: "1",
+            unit: "stick",
+            required: true
+        },
+        {
+            id: "6",
+            name: "Vanilla",
+            amount: "1",
+            unit: "tsp",
+            required: true
+        },
+        {
+            id: "7",
+            name: "Baking Powder",
+            amount: "1",
+            unit: "tsp",
+            required: true
+        },
+        {
+            id: "8",
+            name: "Salt",
+            amount: "1/2",
+            unit: "tsp",
+            required: true
+        },
     ]
 }

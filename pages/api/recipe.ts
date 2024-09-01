@@ -15,12 +15,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const userId = session.user.id;
 
+    console.log(session.user);
+
     if (req.method === "POST") {
-        const {title, description, image} = JSON.parse(req.body);
-        const numId = Number(req.body.id);
-        if (!!title) await recipeRepository.updateTitle(numId, title);
-        if (!!description) await recipeRepository.updateDescription(numId, description);
-        if (!!image) await recipeRepository.updateImage(numId, image);
+        const {title, description, image, id} = JSON.parse(req.body);
+        if (!id) {
+            res.status(400).json({error: "No recipe id provided"});
+            return;
+        }
+        if (!!title) await recipeRepository.updateTitle(id, title);
+        if (!!description) await recipeRepository.updateDescription(id, description);
+        if (!!image) await recipeRepository.updateImage(id, image);
         res.status(200).json({message: "Recipe updated"});
     } else {
         const {title, description, image} = req.body || req.query;

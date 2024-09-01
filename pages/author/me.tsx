@@ -1,7 +1,6 @@
 import {recipeRepository} from "@/src/repositories/recipeRepository";
 import {GetServerSideProps, InferGetServerSidePropsType} from "next";
 import {RecipePreview} from "@/src/model/Recipe";
-import {Author} from "@/src/model/Author";
 import {auth} from "@/pages/api/auth/[...nextauth]";
 import React from "react";
 import {Dialog} from "@/src/components/dialog";
@@ -10,27 +9,27 @@ import {Icon, RecipeCardLarge} from "@/src/components/recipe";
 import {useRouter} from "next/router";
 import Link from "next/link";
 import {GoToLogin} from "@/src/components/auth";
-import {authorRepository} from "@/src/repositories/authorRepository";
+import {useSession} from "next-auth/react";
 
 export const getServerSideProps = (async (context) => {
     const session = await auth(context.req, context.res);
-    const myId = Number(session?.user.id);
-    const recipes = Number.isNaN(myId) ? [] : await recipeRepository.getRecipesByUser(myId);
-    const author = Number.isNaN(myId) ? undefined : await authorRepository.getAuthor(myId);
-    return {props: {recipes, author: author || null}}
+    const myId = session?.user.id as string;
+    const recipes = await recipeRepository.getRecipesByUser(myId);
+    return {props: {recipes}}
 }) satisfies GetServerSideProps<{
     recipes: RecipePreview[],
-    author: Author | null
+    // author: Author | null
 }>
 
 
-export default function Page({recipes, author}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+export default function Page({recipes}: InferGetServerSidePropsType<typeof getServerSideProps>) {
     const router = useRouter();
     const [profileDialogOpen, setProfileDialogOpen] = React.useState(false);
     const [newName, setNewName] = React.useState("");
+    const {status, data} = useSession()
 
     console.log(recipes)
-    if (!author) {
+    if (!data?.user) {
         return <GoToLogin/>
     }
     return (
@@ -40,10 +39,10 @@ export default function Page({recipes, author}: InferGetServerSidePropsType<type
                     onClick={() => setProfileDialogOpen(true)}
                     className={"rounded-full h-20 w-20 overflow-hidden border-4 border-pastelBlue-400"}>
                     {
-                        author.account.image ?
-                            <img src={author.account.image} alt={author.account.name}/> :
+                        data?.user.image ?
+                            <img src={data?.user.image} alt={data?.user.name || ""}/> :
                             <div className={"flex justify-center items-center h-full"}>
-                                <span className={"text-3xl"}>{author.account.name[0]}</span>
+                                <span className={"text-3xl"}>{data?.user.name[0]}</span>
                             </div>
                     }
                 </div>
@@ -64,9 +63,9 @@ export default function Page({recipes, author}: InferGetServerSidePropsType<type
                                 }}
                             />
                             : <h1 className={"font-bold"}
-                                  onClick={() => setNewName(author.account.name)}>{author.account.name}</h1>
+                                  onClick={() => setNewName(data?.user.name)}>{data?.user.name}</h1>
                     }
-                    {author.bio && <p dangerouslySetInnerHTML={{__html: author.bio}}></p>}
+                    {/*{author.bio && <p dangerouslySetInnerHTML={{__html: author.bio}}></p>}*/}
                 </div>
 
                 <div className={"flex flex-col gap-2 items-center"}>
@@ -78,7 +77,7 @@ export default function Page({recipes, author}: InferGetServerSidePropsType<type
             <div className={"flex flex-row gap-2 p-2 items-center"}>
                 <div className={"flex flex-col gap-2"}>
                     <h1 className={"font-bold"}>Bio</h1>
-                    <p>{author.bio}</p>
+                    {/*<p>{author.bio}</p>*/}
                 </div>
             </div>
 

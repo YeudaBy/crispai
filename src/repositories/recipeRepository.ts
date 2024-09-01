@@ -9,42 +9,42 @@ import {Category} from "../model/Category";
 import {AccountPreview} from "@/src/model/Account";
 
 export interface IRecipeRepository {
-    getRecipe(id: number): Promise<Recipe | undefined>;
+    getRecipe(id: string): Promise<Recipe | undefined>;
 
-    getRecipePreview(id: number): Promise<RecipePreview | undefined>;
+    getRecipePreview(id: string): Promise<RecipePreview | undefined>;
 
     getRecipesByLikes(): Promise<RecipePreview[]>;
 
     getRecipesByDate(): Promise<RecipePreview[]>;
 
-    getRecipesByUser(userId: number): Promise<RecipePreview[]>;
+    getRecipesByUser(userId: string): Promise<RecipePreview[]>;
 
-    getRecipesByCategory(category: number): Promise<RecipePreview[]>;
+    getRecipesByCategory(category: string): Promise<RecipePreview[]>;
 
     getRecipesBySearch(search: string): Promise<RecipePreview[]>;
 
     createRecipe(
         title: string,
         description: string,
-        userId: number,
+        userId: string,
         image?: string
-    ): Promise<number>;
+    ): Promise<string>;
 
-    updateTitle(id: number, title: string): Promise<void>;
+    updateTitle(id: string, title: string): Promise<void>;
 
-    updateDescription(id: number, description: string): Promise<void>;
+    updateDescription(id: string, description: string): Promise<void>;
 
-    updateImage(id: number, image: string): Promise<void>;
+    updateImage(id: string, image: string): Promise<void>;
 
-    deleteRecipe(id: number): void;
+    deleteRecipe(id: string): void;
 
-    likeRecipe(id: number, userId: number): void;
+    likeRecipe(id: string, userId: string): void;
 
-    unlikeRecipe(id: number, userId: number): void;
+    unlikeRecipe(id: string, userId: string): void;
 
-    getLikedRecipes(userId: number): Promise<RecipePreview[]>;
+    getLikedRecipes(userId: string): Promise<RecipePreview[]>;
 
-    getUsersWhoLiked(id: number): Promise<AccountPreview[]>;
+    getUsersWhoLiked(id: string): Promise<AccountPreview[]>;
 
     getTags(): Promise<Tag[]>;
 
@@ -52,7 +52,7 @@ export interface IRecipeRepository {
 }
 
 class RecipeRepository implements IRecipeRepository {
-    async getRecipe(id: number): Promise<Recipe | undefined> {
+    async getRecipe(id: string): Promise<Recipe | undefined> {
         const cd = await kv.get<Recipe>(`recipe_${id}`);
         if (cd) return cd
 
@@ -67,7 +67,7 @@ class RecipeRepository implements IRecipeRepository {
                 'recipe.description',
                 'recipe.date',
                 'recipe.account',
-                'recipe.image',
+                'recipe.main_image',
 
                 // account
                 'account.id as user_id',
@@ -85,15 +85,15 @@ class RecipeRepository implements IRecipeRepository {
             return undefined
         }
 
-        const ingredients = await this.getRecipeIngredients(id);
-        const comments = await commentRepository.getCommentsByRecipe(id);
+        const ingredients = [] // await this.getRecipeIngredients(id);
+        const comments = [] //await commentRepository.getCommentsByRecipe(id);
 
         const data: Recipe = {
             id: recipe.recipe_id,
             title: recipe.title,
             description: recipe.description,
             likes: Number(recipe.likes_count),
-            image: recipe.image,
+            main_image: recipe.main_image,
             date: recipe.date.getDate(),
             account: {
                 id: recipe.user_id,
@@ -113,7 +113,7 @@ class RecipeRepository implements IRecipeRepository {
         return data
     }
 
-    async getRecipePreview(id: number): Promise<RecipePreview | undefined> {
+    async getRecipePreview(id: string): Promise<RecipePreview | undefined> {
         const cd = await kv.get<RecipePreview>(`recipe_preview_${id}`);
         if (cd) return cd
 
@@ -128,7 +128,7 @@ class RecipeRepository implements IRecipeRepository {
                 'recipe.description',
                 'recipe.date',
                 'recipe.account',
-                'recipe.image',
+                'recipe.main_image',
 
                 // author
                 'account.id as user_id',
@@ -149,7 +149,7 @@ class RecipeRepository implements IRecipeRepository {
             id: recipe.id,
             title: recipe.title,
             description: recipe.description,
-            image: recipe.image,
+            image: recipe.main_image,
             date: recipe.date.getDate(),
             account: {
                 id: recipe.user_id,
@@ -207,7 +207,7 @@ class RecipeRepository implements IRecipeRepository {
         return valid
     }
 
-    async getRecipesByUser(userId: number): Promise<Recipe[]> {
+    async getRecipesByUser(userId: string): Promise<Recipe[]> {
         const cd = await kv.get<Recipe[]>(`recipes_by_user_${userId}`);
         if (cd) return cd
 
@@ -226,7 +226,7 @@ class RecipeRepository implements IRecipeRepository {
         return valid
     }
 
-    async getRecipesByCategory(category: number): Promise<Recipe[]> {
+    async getRecipesByCategory(category: string): Promise<Recipe[]> {
         // todo implement
         return []
     }
@@ -248,9 +248,9 @@ class RecipeRepository implements IRecipeRepository {
     async createRecipe(
         title: string,
         description: string,
-        userId: number,
+        userId: string,
         image?: string
-    ): Promise<number> {
+    ): Promise<string> {
         const newRecipe = await db
             .insertInto('recipe')
             .values({
@@ -258,7 +258,7 @@ class RecipeRepository implements IRecipeRepository {
                 description,
                 account: userId,
                 date: new Date(),
-                image,
+                main_image: image,
             })
             .returning('id')
             .executeTakeFirst();
@@ -270,7 +270,7 @@ class RecipeRepository implements IRecipeRepository {
         return newRecipe.id;
     }
 
-    async updateTitle(id: number, title: string): Promise<void> {
+    async updateTitle(id: string, title: string): Promise<void> {
         await db
             .updateTable('recipe')
             .set({
@@ -281,7 +281,7 @@ class RecipeRepository implements IRecipeRepository {
         await kv.del(`recipe_${id}`)
     }
 
-    async updateDescription(id: number, description: string): Promise<void> {
+    async updateDescription(id: string, description: string): Promise<void> {
         await db
             .updateTable('recipe')
             .set({description})
@@ -289,16 +289,16 @@ class RecipeRepository implements IRecipeRepository {
             .execute();
     }
 
-    async updateImage(id: number, image: string): Promise<void> {
+    async updateImage(id: string, image: string): Promise<void> {
         await db
             .updateTable('recipe')
-            .set({image})
+            .set({main_image: image})
             .where('id', '=', id)
             .execute();
         await kv.del(`recipe_${id}`)
     }
 
-    async deleteRecipe(id: number) {
+    async deleteRecipe(id: string) {
         await db
             .deleteFrom('recipe')
             .where('id', '=', id)
@@ -306,7 +306,7 @@ class RecipeRepository implements IRecipeRepository {
         await kv.del(`recipe_${id}`)
     }
 
-    async likeRecipe(id: number, userId: number) {
+    async likeRecipe(id: string, userId: string) {
         await db
             .insertInto('recipe_like')
             .values({
@@ -317,7 +317,7 @@ class RecipeRepository implements IRecipeRepository {
         await kv.del(`recipe_${id}`)
     }
 
-    unlikeRecipe(id: number, userId: number) {
+    unlikeRecipe(id: string, userId: string) {
         db
             .deleteFrom('recipe_like')
             .where('recipe', '=', id)
@@ -325,7 +325,7 @@ class RecipeRepository implements IRecipeRepository {
             .execute();
     }
 
-    async getLikedRecipes(userId: number): Promise<Recipe[]> {
+    async getLikedRecipes(userId: string): Promise<Recipe[]> {
         const ids = await db
             .selectFrom('recipe_like')
             .select(['recipe'])
@@ -339,7 +339,7 @@ class RecipeRepository implements IRecipeRepository {
         return recipes.filter((recipe): recipe is Recipe => recipe !== undefined)
     }
 
-    async getUsersWhoLiked(id: number): Promise<AccountPreview[]> {
+    async getUsersWhoLiked(id: string): Promise<AccountPreview[]> {
         const ids = await db
             .selectFrom('recipe_like')
             .select(['account'])
@@ -353,7 +353,7 @@ class RecipeRepository implements IRecipeRepository {
         return users.filter((user): user is AccountPreview => user !== undefined)
     }
 
-    private async getRecipeIngredients(id: number): Promise<Ingredient[]> {
+    private async getRecipeIngredients(id: string): Promise<Ingredient[]> {
         return db
             .selectFrom('ingredient')
             .select(['id', 'name', 'amount', 'unit', "required"])

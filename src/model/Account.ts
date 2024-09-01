@@ -1,7 +1,7 @@
 import {Generated} from "kysely";
 
 export interface Account {
-    id: number
+    id: string
     password?: string
     name: string
     email: string
@@ -9,13 +9,13 @@ export interface Account {
 }
 
 export interface AccountPreview {
-    id: number
+    id: string
     name: string
     image?: string
 }
 
 export interface AccountTable {
-    id: Generated<number>
+    id: Generated<string>
     password?: string
     name: string
     email: string

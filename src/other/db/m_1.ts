@@ -4,8 +4,8 @@ export async function up(db: Kysely<any>): Promise<void> {
 
     await db.schema
         .createTable("account")
-        .addColumn("id", "uuid", (col) =>
-            col.primaryKey().defaultTo(sql`gen_random_uuid
+        .addColumn("id", "char(8)", (col) =>
+            col.primaryKey().defaultTo(sql`short_uuid
                 ()`)
         )
         .addColumn("name", "text")
@@ -16,7 +16,7 @@ export async function up(db: Kysely<any>): Promise<void> {
 
     await db.schema
         .createTable("author")
-        .addColumn("account", "uuid", (col) =>
+        .addColumn("account", "char(8)", (col) =>
             col.references("account.id").onDelete("cascade").notNull()
         )
         .addColumn("verified", "boolean", (col) => col.notNull().defaultTo(false))
@@ -25,30 +25,29 @@ export async function up(db: Kysely<any>): Promise<void> {
 
     await db.schema
         .createTable("recipe")
-        .addColumn("id", "uuid", (col) =>
-            col.primaryKey().defaultTo(sql`gen_random_uuid
-                ()`)
+        .addColumn("id", "char(8)", (col) => col.primaryKey().defaultTo(sql`short_uuid
+            ()`)
         )
-        .addColumn("account", "uuid", (col) =>
+        .addColumn("account", "char(8)", (col) =>
             col.references("account.id").onDelete("cascade").notNull()
         )
         .addColumn("title", "text", (col) => col.notNull())
         .addColumn("description", "text")
-        .addColumn("mainImage", "text")
+        .addColumn("main_image", "text")
         .addColumn("date", "timestamptz", (col) => col.notNull())
         .addColumn("avgEstimate", "float4")
         .execute()
 
     await db.schema
         .createTable("comment")
-        .addColumn("id", "uuid", (col) =>
-            col.primaryKey().defaultTo(sql`gen_random_uuid
+        .addColumn("id", "char(8)", (col) =>
+            col.primaryKey().defaultTo(sql`short_uuid
                 ()`)
         )
-        .addColumn("account", "uuid", (col) =>
+        .addColumn("account", "char(8)", (col) =>
             col.references("account.id").onDelete("cascade").notNull()
         )
-        .addColumn("recipe", "uuid", (col) =>
+        .addColumn("recipe", "char(8)", (col) =>
             col.references("recipe.id").onDelete("cascade").notNull()
         )
         .addColumn("content", "text")
@@ -62,8 +61,8 @@ export async function up(db: Kysely<any>): Promise<void> {
     // add category table
     await db.schema
         .createTable("category")
-        .addColumn("id", "uuid", (col) =>
-            col.primaryKey().defaultTo(sql`gen_random_uuid
+        .addColumn("id", "char(8)", (col) =>
+            col.primaryKey().defaultTo(sql`short_uuid
                 ()`)
         )
         .addColumn("name", "text")
@@ -72,10 +71,10 @@ export async function up(db: Kysely<any>): Promise<void> {
 
     await db.schema
         .createTable("recipe_category")
-        .addColumn("recipe", "uuid", (col) =>
+        .addColumn("recipe", "char(8)", (col) =>
             col.references("recipe.id").onDelete("cascade").notNull()
         )
-        .addColumn("category", "uuid", (col) =>
+        .addColumn("category", "char(8)", (col) =>
             col.references("category.id").onDelete("cascade").notNull()
         )
         .execute()
@@ -83,10 +82,10 @@ export async function up(db: Kysely<any>): Promise<void> {
     // add recipe_like table
     await db.schema
         .createTable("recipe_like")
-        .addColumn("account", "uuid", (col) =>
+        .addColumn("account", "char(8)", (col) =>
             col.references("account.id").onDelete("cascade").notNull()
         )
-        .addColumn("recipe", "uuid", (col) =>
+        .addColumn("recipe", "char(8)", (col) =>
             col.references("recipe.id").onDelete("cascade").notNull()
         )
         .execute()
@@ -148,8 +147,12 @@ export async function up(db: Kysely<any>): Promise<void> {
 }
 
 export async function down(db: Kysely<any>): Promise<void> {
-    await db.schema.dropTable("Account").ifExists().execute()
-    await db.schema.dropTable("Session").ifExists().execute()
-    await db.schema.dropTable("User").ifExists().execute()
-    await db.schema.dropTable("VerificationToken").ifExists().execute()
+    await db.schema.dropTable("recipe_category").execute()
+    await db.schema.dropTable("recipe_like").execute()
+    await db.schema.dropTable("category").execute()
+    await db.schema.dropTable("comment").execute()
+    await db.schema.dropTable("recipe").execute()
+    await db.schema.dropTable("author").execute()
+    await db.schema.dropTable("account").execute()
+
 }

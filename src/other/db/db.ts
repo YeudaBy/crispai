@@ -22,13 +22,13 @@ export interface Database {
     comment: CommentTable,
 
     recipe_like: {
-        recipe: number,
-        account: number,
+        recipe: string,
+        account: string,
     },
 
     recipe_category: {
-        recipe: number,
-        category: number,
+        recipe: string,
+        category: string,
     },
 }
 

@@ -5,18 +5,17 @@ import {Category} from "@/src/model/Category";
 import {Equipment} from "@/src/model/Equipment";
 import {RecipeComment} from "@/src/model/RecipeComment";
 import {Generated} from "kysely";
-import {Author} from "@/src/model/Author";
 import {AccountPreview} from "@/src/model/Account";
 
 export type Recipe = {
-    id: number;
+    id: string;
     title: string;
     description?: string;
     likes: number;
     /* is number for serialization */
     date: number;
     account: AccountPreview;
-    image?: string;
+    main_image?: string;
     comments: RecipeComment[];
     ingredients: Ingredient[];
     steps: Step[];
@@ -27,7 +26,7 @@ export type Recipe = {
 }
 
 export type RecipePreview = {
-    id: number;
+    id: string;
     title: string;
     description?: string;
     image?: string;
@@ -38,11 +37,11 @@ export type RecipePreview = {
 }
 
 export interface RecipeTable {
-    id: Generated<number>
+    id: Generated<string>
     title: string
     description?: string
-    image?: string;
+    main_image?: string;
     date: Date
-    account: number
+    account: string
     avgEstimate?: number
 }

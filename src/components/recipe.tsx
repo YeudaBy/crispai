@@ -5,9 +5,9 @@ import React from "react";
 export function RecipeCardLarge({recipe}: { recipe: RecipePreview }) {
     return (
         <div
-            className="shadow-lg rounded-tr-bl-6xl overflow-hidden w-full bg-blue-mint-lighter/50">
+            className="hover:shadow-lg rounded-tr-3xl overflow-hidden w-full bg-blue-mint-lighter/50">
             <img src={recipe.image || "https://placehold.co/600x400"} alt={recipe.title}
-                 className="w-full rounded-b-6xl h-56 object-cover hover:scale-x-105 transform transition-all duration-300"/>
+                 className="w-full h-56 object-cover hover:scale-x-105 transform transition-all duration-300"/>
 
             <div className={'p-4'}>
                 <Link href={`/recipe/${recipe.id}`}>

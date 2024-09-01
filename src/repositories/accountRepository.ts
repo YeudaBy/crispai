@@ -2,13 +2,13 @@ import {Account, AccountPreview} from "../model/Account";
 import {db} from "../other/db/db";
 
 export interface IUserRepository {
-    getAccount(id: number): Promise<Account | undefined>;
+    getAccount(id: string): Promise<Account | undefined>;
 
-    getAccountPreview(id: number): Promise<AccountPreview | undefined>;
+    getAccountPreview(id: string): Promise<AccountPreview | undefined>;
 
     getAccountByEmail(email: string): Promise<Account | undefined>;
 
-    getAccountIdByEmail(email: string): Promise<{ id: number } | undefined>;
+    getAccountIdByEmail(email: string): Promise<{ id: string } | undefined>;
 
     checkPassword(email: string, password: string): Promise<boolean>;
 
@@ -16,26 +16,26 @@ export interface IUserRepository {
         name: string,
         email: string,
         image?: string,
-    ): Promise<number | undefined>;
+    ): Promise<string | undefined>;
 
     createAccountWithPassword(
         name: string,
         password: string,
         email: string,
         image?: string,
-    ): Promise<number | undefined>;
+    ): Promise<string | undefined>;
 
-    changeImage(userId: number, image: string | undefined): Promise<void>;
+    changeImage(userId: string, image: string | undefined): Promise<void>;
 
-    changeName(userId: number, name: string): Promise<void>;
+    changeName(userId: string, name: string): Promise<void>;
 
-    changeEmail(userId: number, email: string): Promise<void>;
+    changeEmail(userId: string, email: string): Promise<void>;
 
-    changePassword(userId: number, password: string): Promise<void>;
+    changePassword(userId: string, password: string): Promise<void>;
 }
 
 class AccountRepository implements IUserRepository {
-    getAccount(id: number): Promise<Account | undefined> {
+    getAccount(id: string): Promise<Account | undefined> {
         return db
             .selectFrom("account")
             .where("id", "=", id)
@@ -43,7 +43,7 @@ class AccountRepository implements IUserRepository {
             .executeTakeFirst()
     }
 
-    getAccountPreview(id: number): Promise<AccountPreview | undefined> {
+    getAccountPreview(id: string): Promise<AccountPreview | undefined> {
         return db
             .selectFrom("account")
             .where("id", "=", id)
@@ -59,7 +59,7 @@ class AccountRepository implements IUserRepository {
             .executeTakeFirst()
     }
 
-    getAccountIdByEmail(email: string): Promise<{ id: number; } | undefined> {
+    getAccountIdByEmail(email: string): Promise<{ id: string; } | undefined> {
         return db
             .selectFrom("account")
             .where("email", "=", email)
@@ -77,7 +77,7 @@ class AccountRepository implements IUserRepository {
             .then((account) => account !== undefined)
     }
 
-    createAccount(name: string, email: string, image?: string): Promise<number | undefined> {
+    createAccount(name: string, email: string, image?: string): Promise<string | undefined> {
         return db
             .insertInto("account")
             .values({name, email, image})
@@ -86,7 +86,7 @@ class AccountRepository implements IUserRepository {
             .then((result) => result?.id)
     }
 
-    createAccountWithPassword(name: string, password: string, email: string, image?: string): Promise<number | undefined> {
+    createAccountWithPassword(name: string, password: string, email: string, image?: string): Promise<string | undefined> {
         return db
             .insertInto("account")
             .values({name, password, email, image})
@@ -95,7 +95,7 @@ class AccountRepository implements IUserRepository {
             .then((result) => result?.id)
     }
 
-    async changeImage(userId: number, image: string | undefined): Promise<void> {
+    async changeImage(userId: string, image: string | undefined): Promise<void> {
         await db
             .updateTable("account")
             .set({image})
@@ -103,7 +103,7 @@ class AccountRepository implements IUserRepository {
             .execute();
     }
 
-    async changeName(userId: number, name: string): Promise<void> {
+    async changeName(userId: string, name: string): Promise<void> {
         await db
             .updateTable("account")
             .set({name})
@@ -111,7 +111,7 @@ class AccountRepository implements IUserRepository {
             .execute();
     }
 
-    async changeEmail(userId: number, email: string): Promise<void> {
+    async changeEmail(userId: string, email: string): Promise<void> {
         await db
             .updateTable("account")
             .set({email})
@@ -119,7 +119,7 @@ class AccountRepository implements IUserRepository {
             .execute();
     }
 
-    async changePassword(userId: number, password: string): Promise<void> {
+    async changePassword(userId: string, password: string): Promise<void> {
         await db
             .updateTable("account")
             .set({password})

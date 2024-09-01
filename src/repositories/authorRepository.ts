@@ -2,12 +2,12 @@ import {Author} from "@/src/model/Author";
 import {db} from "@/src/other/db/db";
 
 export interface IAuthorRepository {
-    getAuthor(id: number): Promise<Author | undefined>;
+    getAuthor(id: string): Promise<Author | undefined>;
 }
 
 class AuthorRepository implements IAuthorRepository {
 
-    async getAuthor(id: number): Promise<Author | undefined> {
+    async getAuthor(id: string): Promise<Author | undefined> {
         const result = await db
             .selectFrom('author')
             .innerJoin('account', 'author.account', 'account.id')

@@ -2,7 +2,7 @@ import {Generated} from "kysely";
 import {AccountPreview} from "@/src/model/Account";
 
 export type RecipeComment = {
-    id: number;
+    id: string;
     content: string;
     /* number for serialization */
     date: number;
@@ -14,11 +14,11 @@ export type RecipeComment = {
 }
 
 export interface CommentTable {
-    id: Generated<number>
+    id: Generated<string>
     content: string
     date: Generated<Date>
-    account: number
-    recipe: number
+    account: string
+    recipe: string
     likes: Generated<number>
     author_reply?: string
     author_like: Generated<boolean>

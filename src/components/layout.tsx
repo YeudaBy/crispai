@@ -1,8 +1,8 @@
-import React from "react";
-import {NextFont} from "next/dist/compiled/@next/font";
+import React, {useEffect} from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {Inter} from "next/font/google";
+import {useRouter} from "next/router";
 
 const inter = Inter({
     weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
@@ -49,34 +49,59 @@ export function Layout({children, isHome, bnb = <BottomNavBar/>}: {
     );
 }
 
+const items = [
+    {
+        icon: "/home-icon.svg",
+        link: "/"
+    },
+    {
+        icon: "/search-icon.svg",
+        link: "/search"
+    },
+    {
+        icon: "/add-icon.svg",
+        link: "/recipe/add"
+    },
+    {
+        icon: "/profile-icon.svg",
+        link: "/author/me"
+    },
+    {
+        icon: "/settings-icon.svg",
+        link: "/settings"
+    }
+]
 
 export function BottomNavBar() {
-    return (
-        <div className={"fixed w-screen bottom-4 align-bottom h-fit max-w-4xl mb-4 px-2"}>
+
+    const [active, setActive] = React.useState(0)
+    const router = useRouter()
+
+    useEffect(() => {
+        const path = router.pathname
+        const index = items.findIndex((item) => item.link === path)
+        setActive(index)
+    }, [router.pathname]);
+
+    function Icon() {
+        return (
             <div
-                className={`rounded-full gap-16 text-brown-text shadow-sm shadow-brown-text flex justify-between items-center bg-brown-lighter p-2`}>
+                className={"w-6 h-6 rounded-full border-2 border-blue-mint-dark p-2 m-2"}></div>
+        )
+    }
 
-                <div
-                    className={'flex p-2 shadow-sm text-sm tracking-wide font-light shadow-brown-text bg-white rounded-full w-full flex-col items-center'}>
-                    profile
-                </div>
-
-                <div
-                    className={"absolute right-0 left-0 mx-auto -top-2/4 bg-brown-lighter rounded-full h-16 w-16 flex justify-center items-center"}>
-                    <Link href={"/recipe/add"}>
+    return (
+        <div className={"fixed w-screen bottom-0 align-bottom h-fit max-w-4xl"}>
+            <div
+                className={"flex justify-between bg-gradient-to-r from-blue-mint-lighter to-blue-mint-light hover:bg-gradient-to-tr"}>
+                {items.map((item, index) => (
+                    <Link key={index} href={item.link}>
                         <div
-                            className={"bg-white shadow-sm shadow-brown-text rounded-full h-12 w-12 flex justify-center items-center"}>
-                            +
+                            className={`relative flex items-center justify-center p-2 ${active === index ? "text-blue-400 bnb-active-item" : "text-blue-200"}`}>
+                            <Icon/>
                         </div>
                     </Link>
-                </div>
-
-                <Link href={"/author/me"} className={"w-full"}>
-                    <div
-                        className={'flex p-2 shadow-sm text-sm tracking-wide font-light shadow-brown-text bg-white rounded-full w-full flex-col items-center'}>
-                        profile
-                    </div>
-                </Link>
+                ))}
             </div>
         </div>
     )

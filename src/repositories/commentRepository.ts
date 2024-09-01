@@ -3,31 +3,31 @@ import {RecipeComment} from "../model/RecipeComment";
 
 export interface ICommentRepository {
     getCommentsByRecipe(
-        recipeId: number,
+        recipeId: string,
         from?: number,
         limit?: number,
         orderBy?: 'date' | 'likes',
     ): Promise<RecipeComment[]>;
 
     createComment(
-        recipeId: number,
-        userId: number,
+        recipeId: string,
+        userId: string,
         content: string,
     ): void;
 
-    deleteComment(id: number): void;
+    deleteComment(id: string): void;
 
-    pinComment(id: number): void;
+    pinComment(id: string): void;
 
-    likeAsAuthor(id: number, content: string): void;
+    likeAsAuthor(id: string, content: string): void;
 
-    increaseLikes(id: number): void;
+    increaseLikes(id: string): void;
 }
 
 class CommentRepository implements ICommentRepository {
 
     async getCommentsByRecipe(
-        recipeId: number,
+        recipeId: string,
         from = 0,
         limit = 10,
         orderBy: 'date' | 'likes' = 'date'
@@ -74,8 +74,8 @@ class CommentRepository implements ICommentRepository {
     }
 
     createComment(
-        recipeId: number,
-        userId: number,
+        recipeId: string,
+        userId: string,
         content: string
     ): void {
         db.insertInto('comment')
@@ -87,13 +87,13 @@ class CommentRepository implements ICommentRepository {
             .execute();
     }
 
-    deleteComment(id: number): void {
+    deleteComment(id: string): void {
         db.deleteFrom('comment')
             .where('id', '=', id)
             .execute();
     }
 
-    pinComment(id: number): void {
+    pinComment(id: string): void {
         db.updateTable('comment')
             .set({
                 pined: true,
@@ -102,7 +102,7 @@ class CommentRepository implements ICommentRepository {
             .execute();
     }
 
-    likeAsAuthor(id: number, content: string): void {
+    likeAsAuthor(id: string, content: string): void {
         db.updateTable('comment')
             .set({
                 author_reply: content,
@@ -111,7 +111,7 @@ class CommentRepository implements ICommentRepository {
             .execute();
     }
 
-    increaseLikes(id: number): void {
+    increaseLikes(id: string): void {
         db.updateTable('comment')
             .set((eb) => ({
                 likes: eb('likes', "+", 1),
