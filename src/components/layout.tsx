@@ -3,6 +3,19 @@ import Image from "next/image";
 import Link from "next/link";
 import {Inter} from "next/font/google";
 import {useRouter} from "next/router";
+import {
+    RemixiconComponentType,
+    RiHomeFill,
+    RiHomeLine,
+    RiSearchFill,
+    RiSearchLine,
+    RiSettingsFill,
+    RiSettingsLine,
+    RiStickyNoteAddFill,
+    RiStickyNoteAddLine,
+    RiUserFill,
+    RiUserLine
+} from "@remixicon/react";
 
 const inter = Inter({
     weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
@@ -50,25 +63,34 @@ export function Layout({children, isHome, bnb = <BottomNavBar/>}: {
     );
 }
 
-const items = [
+const items: {
+    Icon: RemixiconComponentType,
+    ActiveIcon: RemixiconComponentType,
+    link: string
+}[] = [
     {
-        icon: "/home-icon.svg",
+        Icon: RiHomeLine,
+        ActiveIcon: RiHomeFill,
         link: "/"
     },
     {
-        icon: "/search-icon.svg",
+        Icon: RiSearchLine,
+        ActiveIcon: RiSearchFill,
         link: "/search"
     },
     {
-        icon: "/add-icon.svg",
+        Icon: RiStickyNoteAddLine,
+        ActiveIcon: RiStickyNoteAddFill,
         link: "/recipe/add"
     },
     {
-        icon: "/profile-icon.svg",
+        Icon: RiUserLine,
+        ActiveIcon: RiUserFill,
         link: "/author/me"
     },
     {
-        icon: "/settings-icon.svg",
+        Icon: RiSettingsLine,
+        ActiveIcon: RiSettingsFill,
         link: "/settings"
     }
 ]
@@ -84,22 +106,17 @@ export function BottomNavBar() {
         setActive(index)
     }, [router.pathname]);
 
-    function Icon() {
-        return (
-            <div
-                className={"w-6 h-6 rounded-full border-2 border-blue-mint-dark p-2 m-2"}></div>
-        )
-    }
-
     return (
         <div className={"fixed w-screen bottom-0 align-bottom h-15 max-w-4xl"}>
             <div
-                className={"flex justify-between bg-gradient-to-r from-blue-mint-lighter to-blue-mint-light hover:bg-gradient-to-tr"}>
+                className={"flex justify-around bg-brown-lighter"}>
                 {items.map((item, index) => (
                     <Link key={index} href={item.link}>
-                        <div
-                            className={`relative flex items-center justify-center p-2 ${active === index ? "text-blue-400 bnb-active-item" : "text-blue-200"}`}>
-                            <Icon/>
+                        <div className={`relative flex items-center justify-center p-4`}>
+                            {
+                                active === index ? <item.ActiveIcon size={24} color={"brown"}/>
+                                    : <item.Icon size={24} color={"brown"}/>
+                            }
                         </div>
                     </Link>
                 ))}

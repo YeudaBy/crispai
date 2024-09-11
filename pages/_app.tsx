@@ -3,7 +3,6 @@ import "@/styles/styles.scss";
 import type {AppProps} from "next/app";
 import {SessionProvider} from "next-auth/react";
 import {Layout} from "@/src/components/layout";
-import {Inter} from "next/font/google";
 import {ReactElement, ReactNode} from "react";
 import {NextPage} from "next";
 

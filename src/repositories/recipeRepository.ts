@@ -25,8 +25,8 @@ export interface IRecipeRepository {
 
     createRecipe(
         title: string,
-        description: string,
         userId: string,
+        description?: string,
         image?: string
     ): Promise<string>;
 
@@ -254,8 +254,8 @@ class RecipeRepository implements IRecipeRepository {
 
     async createRecipe(
         title: string,
-        description: string,
         userId: string,
+        description?: string,
         image?: string
     ): Promise<string> {
         const newRecipe = await db

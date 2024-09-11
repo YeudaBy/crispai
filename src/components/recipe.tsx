@@ -1,14 +1,19 @@
 import {RecipePreview} from "@/src/model/Recipe";
 import Link from "next/link";
 import React from "react";
+import {ImageWithFallback} from "@/src/components/image";
+import {RiImageLine, RiUserFill} from "@remixicon/react";
 
 export function RecipeCardLarge({recipe}: { recipe: RecipePreview }) {
     return (
         <div
             className="hover:shadow-lg rounded-tr-3xl overflow-hidden w-full bg-blue-mint-lighter/50">
             <Link href={`/recipe/${recipe.id}`}>
-                <img src={recipe.image || "https://placehold.co/600x400"} alt={recipe.title}
-                     className="w-full h-56 object-cover"/>
+                <ImageWithFallback
+                    src={recipe.image}
+                    alt={recipe.title}
+                    Fallback={RiImageLine}
+                    className="w-full h-56 object-cover"/>
             </Link>
 
             <div className={'p-4'}>
@@ -22,7 +27,11 @@ export function RecipeCardLarge({recipe}: { recipe: RecipePreview }) {
                     <Link href={"/author/" + recipe.account.id}>
                         <div className="flex gap-2 items-center bg-blue-mint-lighter p-1 rounded-full px-3">
                             <p className={'text-sm font-light text-blue-mint-text'}>{recipe.account.name}</p>
-                            <img src={recipe.account.image} alt={recipe.account.name} className="w-6 h-6 rounded-full"/>
+                            <ImageWithFallback
+                                src={recipe.account.image}
+                                alt={recipe.account.name}
+                                Fallback={RiUserFill}
+                                className="w-6 h-6 rounded-full"/>
                         </div>
                     </Link>
                 </div>
