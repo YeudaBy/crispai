@@ -5,11 +5,11 @@ import {auth} from "@/pages/api/auth/[...nextauth]";
 import React from "react";
 import {Dialog} from "@/src/components/dialog";
 import {UploadButton} from "@/src/components/uploadthing";
-import {Icon, RecipeCardLarge} from "@/src/components/recipe";
+import {RecipeCardLarge} from "@/src/components/recipe";
 import {useRouter} from "next/router";
 import Link from "next/link";
 import {GoToLogin} from "@/src/components/auth";
-import {useSession} from "next-auth/react";
+import {signOut, useSession} from "next-auth/react";
 
 export const getServerSideProps = (async (context) => {
     const session = await auth(context.req, context.res);
@@ -67,38 +67,43 @@ export default function Page({recipes}: InferGetServerSidePropsType<typeof getSe
                     }
                     {/*{author.bio && <p dangerouslySetInnerHTML={{__html: author.bio}}></p>}*/}
                 </div>
-
-                <div className={"flex flex-col gap-2 items-center"}>
-                    <Icon/>
-                    <p className={"text-sm"}>Settings</p>
-                </div>
             </div>
 
-            <div className={"flex flex-row gap-2 p-2 items-center"}>
-                <div className={"flex flex-col gap-2"}>
-                    <h1 className={"font-bold"}>Bio</h1>
-                    {/*<p>{author.bio}</p>*/}
-                </div>
+            <div>
+                <button onClick={() => signOut()}
+                >
+                    log out
+                </button>
             </div>
+
+            {/*<div className={"flex flex-row gap-2 p-2 items-center"}>*/}
+            {/*    <div className={"flex flex-col gap-2"}>*/}
+            {/*        <h1 className={"font-bold"}>Bio</h1>*/}
+            {/*        /!*<p>{author.bio}</p>*!/*/}
+            {/*    </div>*/}
+            {/*</div>*/}
 
             <div className={"flex flex-row gap-2 p-2 items-center justify-around"}>
                 <div className={"flex flex-col items-center"}>
                     <p className={"text-sm"}>Recipes</p>
-                    <p className={"font-bold"}>{recipes.length}</p>
+                    <p className={"font-light"}>{recipes.length}</p>
                 </div>
+                <div className={"w-0.5 h-10 bg-gray-300"}/>
                 <div className={"flex flex-col items-center"}>
                     <p className={"text-sm"}>Followers</p>
-                    <p className={"font-bold"}>0</p>
+                    <p className={"font-light"}>0</p>
                 </div>
+                <div className={"w-0.5 h-10 bg-gray-300"}/>
                 <div className={"flex flex-col items-center"}>
                     <p className={"text-sm"}>Following</p>
-                    <p className={"font-bold"}>0</p>
+                    <p className={"font-light"}>0</p>
                 </div>
             </div>
 
             <div className={"flex flex-col gap-2 p-2"}>
                 <Link href={"/recipe/add"}>
-                    <div className={"rounded-full bg-blue-mint-lighter hover:bg-blue-mint-light text-blue-mint-text p-4 w-full text-center"}>
+                    <div
+                        className={"rounded-full bg-blue-mint-lighter hover:bg-blue-mint-light text-blue-mint-text p-4 w-full text-center"}>
                         Add New Recipe
                     </div>
                 </Link>

@@ -23,10 +23,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const {title, description, id, images} = JSON.parse(req.body);
 
     console.log(req.method)
+    console.log(userId)
 
     switch (req.method) {
         case "PUT":
-            const newId = await recipeRepository.createRecipe(title, description, userId, images[0]);
+            const newId = await recipeRepository.createRecipe(title, userId, description);
             res.status(200).json({message: "Recipe created", id: newId});
             break;
         case "POST":

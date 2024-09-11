@@ -27,7 +27,6 @@ export interface IRecipeRepository {
         title: string,
         userId: string,
         description?: string,
-        image?: string
     ): Promise<string>;
 
     updateTitle(id: string, title: string): Promise<void>;
@@ -256,7 +255,6 @@ class RecipeRepository implements IRecipeRepository {
         title: string,
         userId: string,
         description?: string,
-        image?: string
     ): Promise<string> {
         const newRecipe = await db
             .insertInto('recipe')
@@ -265,7 +263,6 @@ class RecipeRepository implements IRecipeRepository {
                 description,
                 account: userId,
                 date: new Date(),
-                main_image: image,
             })
             .returning('id')
             .executeTakeFirst();
