@@ -58,6 +58,7 @@ const SignIn: NextPageWithLayout<Props> = ({providers}: Props) => {
                                 className={"font-bold"}>{provider.name}</span></p>
                         </button>
                     ))}
+
                 </div>
             </div>
         </div>
