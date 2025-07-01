@@ -101,18 +101,9 @@
 
 ---
 
-## 📱 Phase 2: Mobile-First Experience (3-4 שבועות)
+## 📱 Phase 2: Mobile-First Experience (2-3 שבועות)
 
-#### 2.1 PWA Implementation
-- [ ] **Progressive Web App**
-  - Service Worker מתקדם
-  - App manifest מלא
-  - Install prompts מעוצבים
-  - Push notifications
-  - Background sync
-  - Offline functionality בסיסית
-
-#### 2.2 Mobile Optimization
+#### 2.1 Mobile Optimization
 - [ ] **Touch Interactions**
   - Swipe gestures למתכונים
   - Pull-to-refresh
@@ -120,12 +111,13 @@
   - Native-like scrolling
   - Gesture-based navigation
 
-- [ ] **Mobile-Specific Features**
+#### 2.2 Mobile-Specific Features
+- [ ] **Enhanced Mobile Experience**
   - Camera integration למתכונים
   - Voice input לחיפוש
-  - Barcode scanning למצרכים
   - Location-based features
   - Share sheet integration
+  - Responsive image galleries
 
 ---
 
@@ -174,33 +166,23 @@
 
 ---
 
-## 🌐 Phase 4: Offline-First Architecture (3-4 שבועות)
+## 🌐 Phase 4: Data Export & Native App Prep (2-3 שבועות)
 
-#### 4.1 Offline Support
-- [ ] **Offline-First Design**
-  - Local database (IndexedDB)
-  - Sync strategy מתקדם
-  - Conflict resolution
-  - Offline recipe creation
-  - Cached images & content
-  - Offline search
+#### 4.1 Data Export & Import
+- [ ] **Export Functionality**
+  - JSON export למתכונים
+  - PDF generation למתכונים
+  - Recipe book export
+  - User data export (GDPR)
+  - Backup functionality
 
-- [ ] **Data Synchronization**
-  - Background sync
-  - Delta updates
-  - Optimistic UI updates
-  - Connection awareness
-  - Retry mechanisms
-  - Data compression
-
-#### 4.2 Local Storage
-- [ ] **Personal Recipe Book**
-  - Local recipe storage
-  - Export/Import functionality
-  - Backup & restore
-  - Cross-device sync
-  - Version control
-  - Merge conflicts handling
+#### 4.2 Native App API Preparation
+- [ ] **API for Native Apps**
+  - Mobile app API endpoints
+  - Sync protocols design
+  - Offline data structure
+  - Authentication for native apps
+  - Push notification infrastructure
 
 ---
 
@@ -326,14 +308,14 @@
 
 ## ⏰ Timeline Summary
 - **Phase 1 (UX/UI)**: 4-6 שבועות ⭐ **עדיפות עליונה**
-- **Phase 2 (Mobile)**: 3-4 שבועות
+- **Phase 2 (Mobile)**: 2-3 שבועות
 - **Phase 3 (Features)**: 4-5 שבועות
-- **Phase 4 (Offline)**: 3-4 שבועות
+- **Phase 4 (Export/API)**: 2-3 שבועות
 - **Phase 5 (Infrastructure)**: 4-5 שבועות
 - **Phase 6 (Security)**: 2-3 שבועות
 - **Phase 7 (Launch)**: 2-3 שבועות
 
-**Total: 22-30 שבועות (5.5-7.5 חודשים)**
+**Total: 20-28 שבועות (5-7 חודשים)**
 
 ---
 
