@@ -33,3 +33,22 @@ export {
   type ModalBodyProps,
   type ModalFooterProps
 } from './Modal';
+export { SearchBar, type SearchBarProps } from './SearchBar';
+export { 
+  FloatingActionButton, 
+  QuickAddMenu,
+  type FloatingActionButtonProps,
+  type QuickAddMenuProps 
+} from './FloatingActionButton';
+export { 
+  Progress,
+  CircularProgress,
+  StepProgress,
+  RecipeProgress,
+  progressVariants,
+  progressBarVariants,
+  type ProgressProps,
+  type CircularProgressProps,
+  type StepProgressProps,
+  type RecipeProgressProps
+} from './Progress';
