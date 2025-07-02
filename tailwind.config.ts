@@ -241,9 +241,14 @@ const config: Config = {
                 'slide-in-down': 'slideInDown 0.3s ease-out',
                 'slide-in-left': 'slideInLeft 0.3s ease-out',
                 'slide-in-right': 'slideInRight 0.3s ease-out',
+                'slide-out-right': 'slideOutRight 0.3s ease-in',
                 'scale-in': 'scaleIn 0.2s ease-out',
                 'float': 'float 3s ease-in-out infinite',
                 'shimmer': 'shimmer 2s linear infinite',
+                
+                // Recipe card animations
+                'recipe-hover': 'recipeHover 0.3s ease-out',
+                'recipe-like': 'recipeLike 0.6s ease-out',
             },
 
             keyframes: {
@@ -271,6 +276,10 @@ const config: Config = {
                     '0%': { transform: 'translateX(20px)', opacity: '0' },
                     '100%': { transform: 'translateX(0)', opacity: '1' },
                 },
+                slideOutRight: {
+                    '0%': { transform: 'translateX(0)', opacity: '1' },
+                    '100%': { transform: 'translateX(100%)', opacity: '0' },
+                },
                 scaleIn: {
                     '0%': { transform: 'scale(0.9)', opacity: '0' },
                     '100%': { transform: 'scale(1)', opacity: '1' },
@@ -282,6 +291,15 @@ const config: Config = {
                 shimmer: {
                     '0%': { transform: 'translateX(-100%)' },
                     '100%': { transform: 'translateX(100%)' },
+                },
+                recipeHover: {
+                    '0%': { transform: 'scale(1) translateY(0)' },
+                    '100%': { transform: 'scale(1.02) translateY(-4px)' },
+                },
+                recipeLike: {
+                    '0%': { transform: 'scale(1)' },
+                    '50%': { transform: 'scale(1.3)' },
+                    '100%': { transform: 'scale(1)' },
                 },
             },
 

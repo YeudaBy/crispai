@@ -1,52 +1,54 @@
-import React, { forwardRef } from 'react';
+import React from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
-import { cn } from '@/src/utils/cn';
+import { cn } from '@/src/lib/utils';
 
 const buttonVariants = cva(
-  // Base styles
-  "inline-flex items-center justify-center rounded-lg font-medium transition-all duration-200 ease-smooth focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 relative overflow-hidden group",
+  "inline-flex items-center justify-center rounded-lg font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:scale-95",
   {
     variants: {
       variant: {
         // Primary variants
-        primary: "bg-brown-400 text-white hover:bg-brown-500 focus-visible:ring-brown-400 shadow-elevation-2 hover:shadow-elevation-3 active:scale-[0.98]",
-        "primary-mint": "bg-blue-mint-300 text-white hover:bg-blue-mint-400 focus-visible:ring-blue-mint-300 shadow-elevation-2 hover:shadow-elevation-3 active:scale-[0.98]",
-        
-        // Secondary variants
-        secondary: "bg-brown-100 text-brown-900 hover:bg-brown-200 focus-visible:ring-brown-300 border border-brown-200 hover:border-brown-300",
-        "secondary-mint": "bg-blue-mint-100 text-blue-mint-900 hover:bg-blue-mint-200 focus-visible:ring-blue-mint-300 border border-blue-mint-200 hover:border-blue-mint-300",
+        primary: "bg-brown-400 text-white hover:bg-brown-500 focus-visible:ring-brown-400 shadow-elevation-2 hover:shadow-elevation-3",
+        secondary: "bg-blue-mint-300 text-white hover:bg-blue-mint-400 focus-visible:ring-blue-mint-300 shadow-elevation-2 hover:shadow-elevation-3",
         
         // Outline variants
-        outline: "border border-brown-300 text-brown-700 hover:bg-brown-50 hover:border-brown-400 focus-visible:ring-brown-300",
-        "outline-mint": "border border-blue-mint-300 text-blue-mint-700 hover:bg-blue-mint-50 hover:border-blue-mint-400 focus-visible:ring-blue-mint-300",
+        outline: "border-2 border-brown-400 text-brown-400 bg-transparent hover:bg-brown-400 hover:text-white focus-visible:ring-brown-400",
+        "outline-secondary": "border-2 border-blue-mint-300 text-blue-mint-300 bg-transparent hover:bg-blue-mint-300 hover:text-white focus-visible:ring-blue-mint-300",
         
         // Ghost variants
-        ghost: "text-brown-700 hover:bg-brown-100 focus-visible:ring-brown-300 hover:text-brown-900",
-        "ghost-mint": "text-blue-mint-700 hover:bg-blue-mint-100 focus-visible:ring-blue-mint-300 hover:text-blue-mint-900",
+        ghost: "text-brown-400 bg-transparent hover:bg-brown-50 focus-visible:ring-brown-400",
+        "ghost-secondary": "text-blue-mint-300 bg-transparent hover:bg-blue-mint-50 focus-visible:ring-blue-mint-300",
         
-        // Accent variants
-        accent: "bg-accent-orange text-white hover:bg-accent-orange/90 focus-visible:ring-accent-orange shadow-elevation-2 hover:shadow-elevation-3 active:scale-[0.98]",
-        coral: "bg-accent-coral text-white hover:bg-accent-coral/90 focus-visible:ring-accent-coral shadow-elevation-2 hover:shadow-elevation-3 active:scale-[0.98]",
+        // Destructive
+        destructive: "bg-error-500 text-white hover:bg-error-600 focus-visible:ring-error-500 shadow-elevation-2 hover:shadow-elevation-3",
+        "destructive-outline": "border-2 border-error-500 text-error-500 bg-transparent hover:bg-error-500 hover:text-white focus-visible:ring-error-500",
         
-        // Semantic variants
-        success: "bg-success-500 text-white hover:bg-success-600 focus-visible:ring-success-500 shadow-elevation-2 hover:shadow-elevation-3 active:scale-[0.98]",
-        warning: "bg-warning-500 text-white hover:bg-warning-600 focus-visible:ring-warning-500 shadow-elevation-2 hover:shadow-elevation-3 active:scale-[0.98]",
-        error: "bg-error-500 text-white hover:bg-error-600 focus-visible:ring-error-500 shadow-elevation-2 hover:shadow-elevation-3 active:scale-[0.98]",
+        // Success
+        success: "bg-success-500 text-white hover:bg-success-600 focus-visible:ring-success-500 shadow-elevation-2 hover:shadow-elevation-3",
         
-        // Special variants
-        link: "text-brown-600 underline-offset-4 hover:underline focus-visible:ring-brown-300 p-0 h-auto",
-        gradient: "bg-gradient-to-r from-brown-400 to-accent-orange text-white hover:from-brown-500 hover:to-accent-orange/90 focus-visible:ring-brown-400 shadow-elevation-2 hover:shadow-elevation-3 active:scale-[0.98]",
+        // Accent
+        accent: "bg-accent-orange text-white hover:bg-accent-terracotta focus-visible:ring-accent-orange shadow-elevation-2 hover:shadow-elevation-3",
+        
+        // Neutral
+        neutral: "bg-neutral-100 text-neutral-700 hover:bg-neutral-200 focus-visible:ring-neutral-400 shadow-elevation-1 hover:shadow-elevation-2",
+        
+        // Link
+        link: "text-brown-400 underline-offset-4 hover:underline focus-visible:ring-brown-400 p-0 h-auto",
       },
       size: {
-        xs: "h-7 px-2 text-caption rounded-md",
-        sm: "h-8 px-3 text-body-sm rounded-md",
-        default: "h-10 px-4 text-body",
-        lg: "h-11 px-6 text-body-lg",
-        xl: "h-12 px-8 text-body-xl",
-        "2xl": "h-14 px-10 text-h5",
-        icon: "h-10 w-10 p-0",
-        "icon-sm": "h-8 w-8 p-0",
-        "icon-lg": "h-12 w-12 p-0",
+        xs: "h-8 px-3 text-body-xs",
+        sm: "h-9 px-4 text-body-sm",
+        default: "h-10 px-6 text-body",
+        lg: "h-11 px-8 text-body-lg",
+        xl: "h-12 px-10 text-body-xl",
+        "2xl": "h-14 px-12 text-h4",
+        
+        // Icon only sizes
+        "icon-xs": "h-8 w-8",
+        "icon-sm": "h-9 w-9",
+        "icon": "h-10 w-10",
+        "icon-lg": "h-11 w-11",
+        "icon-xl": "h-12 w-12",
       },
       fullWidth: {
         true: "w-full",
@@ -73,27 +75,23 @@ export interface ButtonProps
   loading?: boolean;
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
-  children?: React.ReactNode;
 }
 
-const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  (
-    {
-      className,
-      variant,
-      size,
-      fullWidth,
-      loading,
-      leftIcon,
-      rightIcon,
-      children,
-      disabled,
-      ...props
-    },
-    ref
-  ) => {
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ 
+    className, 
+    variant, 
+    size, 
+    fullWidth, 
+    loading, 
+    leftIcon, 
+    rightIcon, 
+    children, 
+    disabled,
+    ...props 
+  }, ref) => {
     const isDisabled = disabled || loading;
-
+    
     return (
       <button
         className={cn(buttonVariants({ variant, size, fullWidth, loading, className }))}
@@ -101,36 +99,39 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         disabled={isDisabled}
         {...props}
       >
-        {/* Loading spinner */}
         {loading && (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-          </div>
+          <svg 
+            className="animate-spin -ml-1 mr-2 h-4 w-4" 
+            xmlns="http://www.w3.org/2000/svg" 
+            fill="none" 
+            viewBox="0 0 24 24"
+          >
+            <circle 
+              className="opacity-25" 
+              cx="12" 
+              cy="12" 
+              r="10" 
+              stroke="currentColor" 
+              strokeWidth="4"
+            />
+            <path 
+              className="opacity-75" 
+              fill="currentColor" 
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            />
+          </svg>
         )}
-        
-        {/* Content wrapper */}
-        <div className={cn("flex items-center gap-2", loading && "opacity-0")}>
-          {leftIcon && (
-            <span className="flex-shrink-0">
-              {leftIcon}
-            </span>
-          )}
-          
-          {children && (
-            <span className="flex-1 text-center">
-              {children}
-            </span>
-          )}
-          
-          {rightIcon && (
-            <span className="flex-shrink-0">
-              {rightIcon}
-            </span>
-          )}
-        </div>
-
-        {/* Hover effect overlay */}
-        <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-[inherit]" />
+        {!loading && leftIcon && (
+          <span className="mr-2 flex items-center">
+            {leftIcon}
+          </span>
+        )}
+        {children}
+        {!loading && rightIcon && (
+          <span className="ml-2 flex items-center">
+            {rightIcon}
+          </span>
+        )}
       </button>
     );
   }
